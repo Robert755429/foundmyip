@@ -62,7 +62,7 @@
         #lockCanvas {
             background: #1e293b;
             border-radius: 50%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 4px solid #334155;
             cursor: pointer;
             touch-action: manipulation;
@@ -93,4 +93,141 @@
     <h1>🔓 Sblocca il Lucchetto</h1>
     
     <div class="stats">
-      
+        <div>LIVELLO: <span id="level-num">1</span></div>
+        <div>RECORD: <span id="high-score">0</span></div>
+    </div>
+
+    <canvas id="lockCanvas" width="280" height="280"></canvas>
+
+    <div class="instructions">
+        Clicca lo schermo o premi <strong>SPAZIO</strong> quando la lancetta tocca il bersaglio!
+    </div>
+
+    <a href="/" class="back-btn">⬅ Torna alla Dashboard</a>
+</div>
+
+<script>
+const canvas = document.getElementById('lockCanvas');
+const ctx = canvas.getContext('2d');
+
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const radius = 100;
+
+let level = 1;
+let highScore = localStorage.getItem('lock_highscore') || 0;
+document.getElementById('high-score').textContent = highScore;
+
+let angle = 0;
+let speed = 0.03;
+let direction = 1;
+let targetAngle = 0;
+const targetRadius = 16;
+let isGameOver = false;
+
+function spawnTarget() {
+    let newAngle;
+    do {
+        newAngle = Math.random() * Math.PI * 2;
+    } while (Math.abs(newAngle - angle) < 1.5);
+    targetAngle = newAngle;
+}
+
+function update() {
+    if (isGameOver) return;
+    angle += speed * direction;
+    if (angle >= Math.PI * 2) angle -= Math.PI * 2;
+    if (angle < 0) angle += Math.PI * 2;
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 12;
+    ctx.stroke();
+
+    const targetX = centerX + Math.cos(targetAngle) * radius;
+    const targetY = centerY + Math.sin(targetAngle) * radius;
+    ctx.beginPath();
+    ctx.arc(targetX, targetY, targetRadius, 0, Math.PI * 2);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+
+    const pointerX = centerX + Math.cos(angle) * radius;
+    const pointerY = centerY + Math.sin(angle) * radius;
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(pointerX, pointerY);
+    ctx.strokeStyle = '#8b5cf6';
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 12, 0, Math.PI * 2);
+    ctx.fillStyle = '#8b5cf6';
+    ctx.fill();
+}
+
+function handleAction() {
+    if (isGameOver) {
+        level = 1;
+        speed = 0.03;
+        direction = 1;
+        isGameOver = false;
+        document.getElementById('level-num').textContent = level;
+        spawnTarget();
+        return;
+    }
+
+    let diff = Math.abs(angle - targetAngle);
+    if (diff > Math.PI) diff = Math.PI * 2 - diff;
+
+    if (diff <= 0.22) {
+        level++;
+        document.getElementById('level-num').textContent = level;
+        if (level - 1 > highScore) {
+            highScore = level - 1;
+            localStorage.setItem('lock_highscore', highScore);
+            document.getElementById('high-score').textContent = highScore;
+        }
+        speed += 0.004;
+        direction *= -1;
+        spawnTarget();
+    } else {
+        isGameOver = true;
+    }
+}
+
+canvas.addEventListener('pointerdown', (e) => { e.preventDefault(); handleAction(); });
+window.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); handleAction(); } });
+
+function gameLoop() {
+    update();
+    draw();
+
+    if (isGameOver) {
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ef4444';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('LUCCHETTO BLOCCATO!', centerX, centerY - 10);
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '14px sans-serif';
+        ctx.fillText('Clicca per riprovare', centerX, centerY + 20);
+    }
+    requestAnimationFrame(gameLoop);
+}
+
+spawnTarget();
+gameLoop();
+</script>
+</body>
+    </html>
+    
