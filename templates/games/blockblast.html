@@ -99,8 +99,8 @@
         }
 
         .cell.preview {
-            background: rgba(132, 169, 140, 0.4);
-            border: 2px dashed #a3b18a;
+            background: rgba(132, 169, 140, 0.5);
+            border: 2px dashed #ffffff;
         }
 
         /* Dock dei pezzi */
@@ -139,14 +139,15 @@
             border-bottom: 1.5px solid #588157;
         }
 
-        /* Pezzo trascinato (Drag avatar) */
+        /* Avatar trascinato fluidissimo sopra il dito */
         .drag-avatar {
             position: fixed;
             pointer-events: none;
             z-index: 1000;
-            display: grid;
-            gap: 4px;
-            transform: translate(-50%, -100%);
+            display: none;
+            grid-gap: 4px;
+            transform: translate(-50%, -140%);
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
         }
 
         .drag-avatar .mini-cell.active {
@@ -155,7 +156,7 @@
             border-radius: 6px;
         }
 
-        /* Animazione dei punti che volano in alto rimpicciolendosi */
+        /* Animazione punti volanti */
         .floating-score {
             position: fixed;
             color: #ffb703;
@@ -266,14 +267,11 @@ function generatePieces() {
             });
         });
 
-        // Touch & Mouse Eventi per Drag
         pieceEl.addEventListener('pointerdown', (e) => startDrag(e, i));
-
         dock.appendChild(pieceEl);
     }
 }
 
-// DRAG & DROP LOGIC
 function startDrag(e, index) {
     if (!currentPieces[index]) return;
     activeDragIndex = index;
@@ -303,14 +301,13 @@ function moveDrag(e) {
     avatar.style.left = e.clientX + 'px';
     avatar.style.top = e.clientY + 'px';
 
-    // Rimuovi anteprime precedenti
     document.querySelectorAll('.cell.preview').forEach(c => c.classList.remove('preview'));
 
-    const hoverTarget = getCellFromCoords(e.clientX, e.clientY - 40);
-    if (hoverTarget && activeDragIndex !== null) {
+    const gridPos = getGridCoordinatesFromTouch(e.clientX, e.clientY);
+    if (gridPos && activeDragIndex !== null) {
         const shape = currentPieces[activeDragIndex];
-        const r = parseInt(hoverTarget.dataset.r);
-        const c = parseInt(hoverTarget.dataset.c);
+        const r = gridPos.r;
+        const c = gridPos.c;
 
         if (canPlaceShape(shape, r, c)) {
             for (let pr = 0; pr < shape.length; pr++) {
@@ -334,15 +331,14 @@ function endDrag(e) {
 
     document.querySelectorAll('.cell.preview').forEach(c => c.classList.remove('preview'));
 
-    const targetCell = getCellFromCoords(e.clientX, e.clientY - 40);
+    const gridPos = getGridCoordinatesFromTouch(e.clientX, e.clientY);
 
-    if (targetCell && activeDragIndex !== null) {
+    if (gridPos && activeDragIndex !== null) {
         const shape = currentPieces[activeDragIndex];
-        const r = parseInt(targetCell.dataset.r);
-        const c = parseInt(targetCell.dataset.c);
+        const r = gridPos.r;
+        const c = gridPos.c;
 
         if (canPlaceShape(shape, r, c)) {
-            // Inserisci il pezzo
             for (let pr = 0; pr < shape.length; pr++) {
                 for (let pc = 0; pc < shape[pr].length; pc++) {
                     if (shape[pr][pc]) {
@@ -352,11 +348,8 @@ function endDrag(e) {
             }
 
             const addedPoints = shape.flat().reduce((a, b) => a + b, 0) * 15;
-            
-            // Animazione Punti che salgono e rimpiccioliscono
             spawnFloatingScore(e.clientX, e.clientY, addedPoints);
 
-            // Nascondi pezzo dal dock
             const dockPieces = document.getElementById('dock').children;
             if (dockPieces[activeDragIndex]) {
                 dockPieces[activeDragIndex].style.visibility = 'hidden';
@@ -375,6 +368,26 @@ function endDrag(e) {
     activeDragIndex = null;
 }
 
+// CALCOLO Matematico Preciso della Griglia (Risolve il problema del blocco non preso)
+function getGridCoordinatesFromTouch(clientX, clientY) {
+    const gridContainer = document.getElementById('gridContainer');
+    const rect = gridContainer.getBoundingClientRect();
+
+    // Verifica se il tocco è sopra o vicino alla griglia
+    if (clientX < rect.left - 20 || clientX > rect.right + 20 || clientY < rect.top - 80 || clientY > rect.bottom + 20) {
+        return null;
+    }
+
+    const cellSize = rect.width / GRID_SIZE;
+    const relX = clientX - rect.left - 10; // 10px padding del container
+    const relY = (clientY - 60) - rect.top - 10; // offset sopra il dito
+
+    const c = Math.floor(relX / cellSize);
+    const r = Math.floor(relY / cellSize);
+
+    return { r: Math.max(0, Math.min(r, GRID_SIZE - 1)), c: Math.max(0, Math.min(c, GRID_SIZE - 1)) };
+}
+
 function canPlaceShape(shape, r, c) {
     for (let pr = 0; pr < shape.length; pr++) {
         for (let pc = 0; pc < shape[pr].length; pc++) {
@@ -390,16 +403,10 @@ function canPlaceShape(shape, r, c) {
     return true;
 }
 
-function getCellFromCoords(x, y) {
-    const el = document.elementFromPoint(x, y);
-    return (el && el.classList.contains('cell')) ? el : null;
-}
-
 function getCellEl(r, c) {
     return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
 }
 
-// ANIMAZIONE PUNTEGGIO TRASCINATO VERSO L'ALTO
 function spawnFloatingScore(x, y, pts) {
     const scoreEl = document.createElement('div');
     scoreEl.className = 'floating-score';
