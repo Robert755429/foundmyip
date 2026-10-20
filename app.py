@@ -14,7 +14,7 @@ app = Flask(__name__)
 # Segreto per le sessioni utente/admin
 app.secret_key = os.environ.get("SECRET_KEY", "chiave_segreta_di_default_cambiala_su_render")
 
-# Password Admin letta in modo sicuro dalle variabili d'ambiente di Render
+# Password Admin letta dalle variabili d'ambiente di Render
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Nicola11.")
 
 # --- DATABASE LOGS (Cronologia IP) ---
@@ -482,11 +482,16 @@ HTML_TEMPLATE = """
 
         <!-- SCHEDA IL MIO IP -->
         <div id="myip-card" class="card {% if active_tab == 'myip' %}active{% endif %}">
-            <h3>Localizza il tuo Indirizzo IP</h3>
-            <p>Rileva automaticamente la posizione e le informazioni relative alla tua connessione attuale.</p>
+            <h3>Localizza il tuo Dispositivo (GPS & IP)</h3>
+            <p>Rileva l'IP di rete (centrale telefonica) oppure usa il GPS per una posizione precisa.</p>
+            
             <form method="POST" action="/myip">
-                <button type="submit" class="action-btn">📍 Localizza il Mio IP Adesso</button>
+                <button type="submit" class="action-btn" style="margin-bottom: 12px;">🌐 Localizza tramite IP Rete</button>
             </form>
+
+            <button type="button" class="action-btn" onclick="getLocationGPS()" style="background: #10b981;">🛰️ Usa GPS Dispositivo (Posizione Esatta)</button>
+            
+            <pre id="gps-result" style="margin-top: 15px; display: none;"></pre>
         </div>
 
         <!-- SCHEDA ADMIN LOGIN / DASHBOARD -->
@@ -521,7 +526,7 @@ HTML_TEMPLATE = """
 
     <footer>
         <p>&copy; 2026 OSINT Dashboard. Tutti i diritti riservati.</p>
-        <p>Licenza: <strong>MIT License</strong> | Sviluppato da Nicola</p>
+        <p>Licenza: <strong>MIT License</strong> | Copyright &copy; <strong>Nix</strong></p>
         <p>
             <a href="#" onclick="openModal('privacyModal')">Informativa sulla Privacy & Cookie</a> | 
             <a href="#" onclick="openModal('termsModal')">Termini di Servizio</a>
@@ -552,6 +557,36 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
+        function getLocationGPS() {
+            const resBox = document.getElementById('gps-result');
+            resBox.style.display = 'block';
+            
+            if (navigator.geolocation) {
+                resBox.textContent = "Richiesta posizione in corso... (accetta il permesso sul browser)";
+                navigator.geolocation.getCurrentPosition(
+                    (position) =>  {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        const acc = position.coords.accuracy;
+                        resBox.textContent = JSON.stringify({
+                            "stato": "successo_gps",
+                            "latitudine": lat,
+                            "longitudine": lon,
+                            "precisione_metri": acc,
+                            "link_mappa": `https://www.google.com/maps?q=${lat},${lon}`,
+                            "nota": "Posizione GPS in tempo reale del tuo dispositivo."
+                        }, null, 2);
+                    },
+                    (error) => {
+                        resBox.textContent = "Errore o permesso negano dall'utente: " + error.message;
+                    },
+                    { enableHighAccuracy: true }
+                );
+            } else {
+                resBox.textContent = "La geolocalizzazione GPS non è supportata dal tuo browser.";
+            }
+        }
+
         function switchTab(tab) {
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
