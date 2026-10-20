@@ -2,15 +2,74 @@ import os
 import re
 import json
 import socket
-from datetime import datetime
+import sqlite3
+from datetime import datetime, timedelta
 import requests
 import phonenumbers
 from phonenumbers import carrier, geocoder, number_type
-from flask import Flask, render_template_string, request
+from flask import Flask, render_template_string, request, session, redirect, url_for
 
 app = Flask(__name__)
 
-# --- IP LOOKUP & PORT SCAN ---
+# Segreto per le sessioni utente/admin
+app.secret_key = os.environ.get("SECRET_KEY", "chiave_segreta_di_default_cambiala_su_render")
+
+# Password Admin letta in modo sicuro dalle variabili d'ambiente di Render
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Nicola11.")
+
+# --- DATABASE LOGS (Cronologia IP) ---
+DB_NAME = "ip_history.db"
+
+def init_db():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS ip_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip TEXT NOT NULL,
+            user_agent TEXT,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+def log_ip_access(ip, user_agent):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO ip_logs (ip, user_agent) VALUES (?, ?)", (ip, user_agent))
+    
+    # Pulizia automatica: elimina record più vecchi di 10 giorni
+    cutoff_date = datetime.now() - timedelta(days=10)
+    cursor.execute("DELETE FROM ip_logs WHERE timestamp < ?", (cutoff_date,))
+    
+    conn.commit()
+    conn.close()
+
+def get_ip_history():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    
+    cutoff_date = datetime.now() - timedelta(days=10)
+    cursor.execute("DELETE FROM ip_logs WHERE timestamp < ?", (cutoff_date,))
+    conn.commit()
+
+    cursor.execute("SELECT ip, user_agent, timestamp FROM ip_logs ORDER BY timestamp DESC")
+    rows = cursor.fetchall()
+    conn.close()
+    return [{"ip": r[0], "user_agent": r[1], "timestamp": r[2]} for r in rows]
+
+init_db()
+
+
+# --- UTILS IP & PORTE ---
+def get_client_ip():
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0].split(',')[0].strip()
+    else:
+        ip = request.remote_addr
+    return ip
+
 def ip_lookup(ip):
     try:
         url = f"http://ip-api.com/json/{ip}?fields=status,message,continent,country,regionName,city,zip,lat,lon,timezone,isp,org,as,reverse,mobile,proxy,hosting,query"
@@ -50,6 +109,7 @@ def scan_ports(ip, ports):
             risultati.append({"porta": p, "stato": "chiusa/filtrata", "rischio": "ok"})
     return risultati
 
+
 # --- PHONE ANALYZER ---
 MOBILE_PREFIX = {
     "330":"TIM","331":"TIM","333":"TIM","334":"TIM","335":"TIM","336":"TIM","337":"TIM","338":"TIM","339":"TIM","360":"TIM","361":"TIM","362":"TIM","363":"TIM","366":"TIM","368":"TIM",
@@ -75,16 +135,13 @@ def analyze_phone(raw):
 
     parsed = phonenumbers.parse(clean, "IT")
     valid = phonenumbers.is_valid_number(parsed)
-    possible = phonenumbers.is_possible_number(parsed)
     t = number_type(parsed)
     t_map = {0:"FISSO/MOBILE", 1:"FISSO", 2:"MOBILE", 3:"FISSO/MOBILE", 4:"TOLL FREE", 5:"PREMIUM"}
     tipo = t_map.get(t, str(t))
 
     e164 = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
-    intl = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
     nat = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.NATIONAL)
     geo = geocoder.description_for_number(parsed, "it")
-    carr_lib = carrier.name_for_number(parsed, "it")
 
     nat_digits = re.sub(r'\D','', nat)
     p3 = nat_digits[:3]
@@ -101,12 +158,12 @@ def analyze_phone(raw):
         "tipo_linea": tipo,
         "posizione_geografica": geo if geo else "Italia",
         "operatore_originario_blocco": op_db,
-        "nota_portabilita": "Se l'utente ha fatto MNP (portabilità), l'operatore attuale (es. ho. Mobile) può variare rispetto a quello nativo.",
         "collegamenti": {
             "whatsapp": f"https://wa.me/{num_wa}",
             "telegram": f"https://t.me/+{num_wa}"
         }
     }
+
 
 # --- TEMPLATE HTML ---
 HTML_TEMPLATE = """
@@ -158,13 +215,17 @@ HTML_TEMPLATE = """
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
             transition: background 0.3s ease;
+            box-sizing: border-box;
         }
 
         .container {
             width: 100%;
-            max-width: 650px;
+            max-width: 700px;
+            flex: 1;
         }
 
         header {
@@ -196,13 +257,15 @@ HTML_TEMPLATE = """
 
         .nav-tabs {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 14px;
+            min-width: 120px;
+            padding: 12px;
             text-align: center;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -211,6 +274,8 @@ HTML_TEMPLATE = """
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
+            font-size: 0.9rem;
         }
 
         .tab-btn.active {
@@ -240,8 +305,8 @@ HTML_TEMPLATE = """
 
         input {
             width: 100%;
-            padding: 14px;
-            margin: 10px 0 20px 0;
+            padding: 12px;
+            margin: 8px 0 16px 0;
             background: var(--input-bg);
             color: var(--text-color);
             border: 1px solid var(--border-color);
@@ -250,7 +315,9 @@ HTML_TEMPLATE = """
             box-sizing: border-box;
         }
 
-        button.action-btn {
+        button.action-btn, a.action-btn {
+            display: inline-block;
+            text-align: center;
             width: 100%;
             padding: 14px;
             background: var(--accent-color);
@@ -261,9 +328,11 @@ HTML_TEMPLATE = """
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
+            text-decoration: none;
+            box-sizing: border-box;
         }
 
-        button.action-btn:hover {
+        button.action-btn:hover, a.action-btn:hover {
             background: var(--accent-hover);
         }
 
@@ -275,6 +344,94 @@ HTML_TEMPLATE = """
             overflow-x: auto;
             font-size: 0.9rem;
             border: 1px solid var(--border-color);
+        }
+
+        .alert-error {
+            background: #7f1d1d;
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #991b1b;
+        }
+
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border-top: 2px solid var(--accent-color);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        #cookie-banner p {
+            margin: 0;
+            font-size: 0.85rem;
+            max-width: 80%;
+        }
+
+        #cookie-banner button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: auto;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            padding: 20px 0 10px 0;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-top: 1px solid var(--border-color);
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-close {
+            float: right;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -292,9 +449,15 @@ HTML_TEMPLATE = """
             </div>
         </header>
 
+        {% if error %}
+            <div class="alert-error">{{ error }}</div>
+        {% endif %}
+
         <div class="nav-tabs">
             <button class="tab-btn {% if active_tab == 'phone' %}active{% endif %}" onclick="switchTab('phone')">📱 Telefono</button>
-            <button class="tab-btn {% if active_tab == 'ip' %}active{% endif %}" onclick="switchTab('ip')">🌐 Indirizzo IP</button>
+            <button class="tab-btn {% if active_tab == 'ip' %}active{% endif %}" onclick="switchTab('ip')">🌐 IP Lookup</button>
+            <button class="tab-btn {% if active_tab == 'myip' %}active{% endif %}" onclick="switchTab('myip')">📍 Il Mio IP</button>
+            <button class="tab-btn {% if active_tab == 'admin' %}active{% endif %}" onclick="switchTab('admin')">🔐 Area Admin</button>
         </div>
 
         <!-- SCHEDA TELEFONO -->
@@ -307,7 +470,7 @@ HTML_TEMPLATE = """
             </form>
         </div>
 
-        <!-- SCHEDA IP -->
+        <!-- SCHEDA IP SCANNER -->
         <div id="ip-card" class="card {% if active_tab == 'ip' %}active{% endif %}">
             <h3>Lookup IP & Porte</h3>
             <form method="POST" action="/ip">
@@ -315,6 +478,37 @@ HTML_TEMPLATE = """
                 <input type="text" name="ip" placeholder="8.8.8.8..." value="{{ ip_val or '' }}" required>
                 <button type="submit" class="action-btn">Scansiona Indirizzo IP</button>
             </form>
+        </div>
+
+        <!-- SCHEDA IL MIO IP -->
+        <div id="myip-card" class="card {% if active_tab == 'myip' %}active{% endif %}">
+            <h3>Localizza il tuo Indirizzo IP</h3>
+            <p>Rileva automaticamente la posizione e le informazioni relative alla tua connessione attuale.</p>
+            <form method="POST" action="/myip">
+                <button type="submit" class="action-btn">📍 Localizza il Mio IP Adesso</button>
+            </form>
+        </div>
+
+        <!-- SCHEDA ADMIN LOGIN / DASHBOARD -->
+        <div id="admin-card" class="card {% if active_tab == 'admin' %}active{% endif %}">
+            {% if session.get('admin_logged_in') %}
+                <h3>🔐 Cronologia IP (Area Riservata Creator)</h3>
+                <p style="font-size: 0.85rem; color: #a7f3d0;">* Nota: Gli IP vengono memorizzati e puliti automaticamente dopo 10 giorni.</p>
+                <a href="/admin/logout" style="color: #fca5a5; display: inline-block; margin-bottom: 15px; text-decoration: none;">🚪 Effettua Logout</a>
+                
+                {% if history %}
+                    <pre>{{ history }}</pre>
+                {% else %}
+                    <p>Nessun IP registrato negli ultimi 10 giorni.</p>
+                {% endif %}
+            {% else %}
+                <h3>🔐 Accesso Riservato Creatore</h3>
+                <form method="POST" action="/admin/login">
+                    <label>Password Amministratore</label>
+                    <input type="password" name="password" placeholder="Inserisci la password..." required>
+                    <button type="submit" class="action-btn">Accedi alla Cronologia IP</button>
+                </form>
+            {% endif %}
         </div>
 
         {% if result %}
@@ -325,20 +519,51 @@ HTML_TEMPLATE = """
         {% endif %}
     </div>
 
+    <footer>
+        <p>&copy; 2026 OSINT Dashboard. Tutti i diritti riservati.</p>
+        <p>Licenza: <strong>MIT License</strong> | Sviluppato da Nicola</p>
+        <p>
+            <a href="#" onclick="openModal('privacyModal')">Informativa sulla Privacy & Cookie</a> | 
+            <a href="#" onclick="openModal('termsModal')">Termini di Servizio</a>
+        </p>
+    </footer>
+
+    <div id="cookie-banner" style="display: none;">
+        <p>Utilizziamo cookie tecnici per garantire le funzionalità del sito e registrare gli accessi (retention 10 giorni). <a href="#" onclick="openModal('privacyModal')" style="color:var(--accent-color);">Leggi la Privacy Policy</a>.</p>
+        <button onclick="acceptCookies()">Accetta e Chiudi</button>
+    </div>
+
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('privacyModal')">&times;</span>
+            <h3>Informativa sulla Privacy & Cookie Policy</h3>
+            <p><strong>1. Trattamento dei Dati:</strong> Questo sito web registra gli indirizzi IP dei visitatori e i dati di navigazione basilari (User Agent) a fini di sicurezza.</p>
+            <p><strong>2. Conservazione:</strong> Gli indirizzi IP memorizzati vengono eliminati automaticamente dopo 10 giorni.</p>
+            <p><strong>3. Cookie:</strong> Vengono utilizzati cookie di sessione necessari per l'autenticazione.</p>
+        </div>
+    </div>
+
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('termsModal')">&times;</span>
+            <h3>Termini e Condizioni</h3>
+            <p>Strumento fornito a scopo didattico e di verifica personale.</p>
+        </div>
+    </div>
+
     <script>
         function switchTab(tab) {
-            document.getElementById('phone-card').classList.remove('active');
-            document.getElementById('ip-card').classList.remove('active');
-            const btns = document.querySelectorAll('.tab-btn');
-            btns.forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 
-            if(tab === 'phone') {
-                document.getElementById('phone-card').classList.add('active');
-                btns[0].classList.add('active');
-            } else {
-                document.getElementById('ip-card').classList.add('active');
-                btns[1].classList.add('active');
-            }
+            const card = document.getElementById(tab + '-card');
+            if(card) card.classList.add('active');
+
+            const btns = document.querySelectorAll('.tab-btn');
+            if(tab === 'phone') btns[0].classList.add('active');
+            if(tab === 'ip') btns[1].classList.add('active');
+            if(tab === 'myip') btns[2].classList.add('active');
+            if(tab === 'admin') btns[3].classList.add('active');
         }
 
         function changeTheme(theme) {
@@ -349,11 +574,28 @@ HTML_TEMPLATE = """
             localStorage.setItem('selected_theme', theme);
         }
 
+        function acceptCookies() {
+            localStorage.setItem('cookies_accepted', 'true');
+            document.getElementById('cookie-banner').style.display = 'none';
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
         window.onload = function() {
             const savedTheme = localStorage.getItem('selected_theme');
             if(savedTheme) {
                 document.getElementById('themeSelect').value = savedTheme;
                 changeTheme(savedTheme);
+            }
+
+            if(!localStorage.getItem('cookies_accepted')) {
+                document.getElementById('cookie-banner').style.display = 'flex';
             }
         }
     </script>
@@ -361,12 +603,19 @@ HTML_TEMPLATE = """
 </html>
 """
 
+# --- ROUTE APP ---
+
 @app.route('/')
 def home():
+    client_ip = get_client_ip()
+    log_ip_access(client_ip, request.user_agent.string)
     return render_template_string(HTML_TEMPLATE, result=None, active_tab='phone', theme='')
 
 @app.route('/ip', methods=['POST'])
 def handle_ip():
+    client_ip = get_client_ip()
+    log_ip_access(client_ip, request.user_agent.string)
+
     ip = request.form.get('ip', '').strip()
     info = ip_lookup(ip)
     porte_comuni = [21,22,23,25,53,80,110,143,443,3306,3389,5900,8080]
@@ -381,6 +630,9 @@ def handle_ip():
 
 @app.route('/phone', methods=['POST'])
 def handle_phone():
+    client_ip = get_client_ip()
+    log_ip_access(client_ip, request.user_agent.string)
+
     phone = request.form.get('phone', '').strip()
     try:
         res = analyze_phone(phone)
@@ -388,6 +640,46 @@ def handle_phone():
     except Exception as e:
         output = json.dumps({"errore": str(e)}, indent=2)
     return render_template_string(HTML_TEMPLATE, result=output, active_tab='phone', phone_val=phone)
+
+@app.route('/myip', methods=['POST'])
+def handle_myip():
+    client_ip = get_client_ip()
+    log_ip_access(client_ip, request.user_agent.string)
+
+    info = ip_lookup(client_ip)
+    output = {
+        "mio_ip": client_ip,
+        "timestamp": datetime.now().isoformat(),
+        "dettagli_geolocalizzazione": info
+    }
+    return render_template_string(HTML_TEMPLATE, result=json.dumps(output, indent=2, ensure_ascii=False), active_tab='myip')
+
+# --- ROUTE ADMIN ---
+
+@app.route('/admin/login', methods=['POST'])
+def admin_login():
+    input_password = request.form.get('password', '').strip()
+
+    if ADMIN_PASSWORD and input_password == ADMIN_PASSWORD:
+        session['admin_logged_in'] = True
+        history = get_ip_history()
+        return render_template_string(
+            HTML_TEMPLATE, 
+            active_tab='admin', 
+            history=json.dumps(history, indent=2, ensure_ascii=False)
+        )
+    else:
+        return render_template_string(
+            HTML_TEMPLATE, 
+            active_tab='admin', 
+            error="Password non valida! Accesso negato."
+        )
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('home'))
+
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
