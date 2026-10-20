@@ -3,49 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Block Blast Colors - FoundmyIp</title>
+    <title>Block Blast - FoundmyIp</title>
     <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-1: #ef4444; /* Rosso */
-            --accent-2: #3b82f6; /* Blu */
-            --grid-bg: #090d16;
-            --border-color: #334155;
-        }
-
-        /* Temi cromatici dinamici */
-        body.theme-mono {
-            --bg-color: #121212;
-            --card-bg: #222222;
-            --text-color: #ffffff;
-            --accent-1: #ffffff;
-            --accent-2: #888888;
-            --grid-bg: #000000;
-            --border-color: #444444;
-        }
-
-        body.theme-cyber {
-            --bg-color: #0f051d;
-            --card-bg: #200c3f;
-            --text-color: #f3e8ff;
-            --accent-1: #ec4899;
-            --accent-2: #8b5cf6;
-            --grid-bg: #090214;
-            --border-color: #4c1d95;
-        }
-
-        body.theme-matrix {
-            --bg-color: #022c22;
-            --card-bg: #064e3b;
-            --text-color: #d1fae5;
-            --accent-1: #10b981;
-            --accent-2: #34d399;
-            --grid-bg: #011c16;
-            --border-color: #065f46;
-        }
-
         * {
             box-sizing: border-box;
             user-select: none;
@@ -54,199 +13,329 @@
 
         body {
             margin: 0;
-            padding: 10px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            padding: 0;
+            background-color: #52796f; /* Verde salvia elegante stile screenshot */
+            color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             min-height: 100vh;
-            transition: background 0.5s ease;
+            overflow: hidden;
         }
 
-        .game-container {
+        .game-header {
             width: 100%;
-            max-width: 400px;
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .header {
+            max-width: 420px;
             display: flex;
             justify-content: space-between;
-            width: 100%;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
+            align-items: center;
+            padding: 15px 20px;
+            font-size: 1.2rem;
             font-weight: bold;
         }
 
-        .score-box span {
-            color: var(--accent-1);
+        .crown-score {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #ffb703;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .theme-indicator {
-            font-size: 0.8rem;
-            color: var(--accent-2);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
+        .settings-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.4rem;
+            cursor: pointer;
         }
 
-        /* Griglia di gioco 8x8 */
+        .main-score {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin: 5px 0 15px 0;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* Griglia di Gioco 8x8 */
+        .grid-container {
+            background: #3a5a40;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 2px solid #2f3e46;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             gap: 4px;
-            background: var(--grid-bg);
-            padding: 8px;
-            border-radius: 10px;
-            border: 2px solid var(--border-color);
-            margin-bottom: 20px;
         }
 
         .cell {
-            width: 35px;
-            height: 35px;
-            background: var(--card-bg);
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            transition: background 0.2s;
+            width: 38px;
+            height: 38px;
+            background: #2f3e46;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.15s;
         }
 
-        .cell.filled-1 {
-            background: var(--accent-1);
-            box-shadow: 0 0 8px var(--accent-1);
+        /* Blocco pieno con effetto 3D */
+        .cell.filled {
+            background: #84a98c;
+            border-top: 2px solid #a3b18a;
+            border-left: 2px solid #a3b18a;
+            border-right: 2px solid #588157;
+            border-bottom: 2px solid #588157;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .cell.filled-2 {
-            background: var(--accent-2);
-            box-shadow: 0 0 8px var(--accent-2);
-        }
-
-        /* Box pezzi da posizionare */
+        /* Dock dei pezzi in basso */
         .pieces-dock {
+            width: 100%;
+            max-width: 420px;
             display: flex;
             justify-content: space-around;
-            width: 100%;
-            background: var(--grid-bg);
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            min-height: 90px;
             align-items: center;
+            padding: 20px 10px;
+            margin-bottom: 20px;
         }
 
         .mini-piece {
             display: grid;
-            gap: 2px;
+            gap: 3px;
             cursor: pointer;
-            padding: 5px;
-            border: 2px dashed transparent;
-            border-radius: 6px;
-            transition: all 0.2s;
+            padding: 10px;
+            border-radius: 8px;
+            transition: transform 0.15s;
         }
 
         .mini-piece:hover {
-            border-color: var(--accent-1);
-            background: rgba(255,255,255,0.05);
+            transform: scale(1.08);
         }
 
         .mini-cell {
-            width: 16px;
-            height: 16px;
-            border-radius: 2px;
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            background: transparent;
         }
 
-        .mini-cell.active-1 { background: var(--accent-1); }
-        .mini-cell.active-2 { background: var(--accent-2); }
-
-        .btn {
-            margin-top: 15px;
-            background: var(--accent-1);
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            transition: opacity 0.2s;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
+        .mini-cell.active {
+            background: #84a98c;
+            border-top: 1.5px solid #a3b18a;
+            border-left: 1.5px solid #a3b18a;
+            border-right: 1.5px solid #588157;
+            border-bottom: 1.5px solid #588157;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.4);
         }
 
         .back-link {
-            margin-top: 15px;
-            color: var(--text-color);
+            color: #d8f3dc;
             text-decoration: none;
             font-size: 0.9rem;
-            opacity: 0.8;
+            margin-bottom: 15px;
+            font-weight: 600;
         }
 
         .back-link:hover {
-            opacity: 1;
             text-decoration: underline;
         }
     </style>
 </head>
-<body class="theme-cyber">
+<body>
 
-<div class="game-container">
-    <div class="header">
-        <div>BLOCK BLAST</div>
-        <div class="score-box">PUNTI: <span id="score">0</span></div>
+    <div class="game-header">
+        <div class="crown-score">
+            <span>👑</span> <span id="high-score">452948</span>
+        </div>
+        <button class="settings-btn" onclick="resetGame()">⚙️</button>
     </div>
-    
-    <div class="theme-indicator" id="themeName">Stile: Cyber Neon</div>
 
-    <!-- Griglia di Gioco -->
-    <div class="grid" id="grid"></div>
+    <div class="main-score" id="score">0</div>
 
-    <!-- Pezzi disponibili -->
+    <!-- Griglia 8x8 -->
+    <div class="grid-container">
+        <div class="grid" id="grid"></div>
+    </div>
+
+    <!-- Sezione Pezzi -->
     <div class="pieces-dock" id="dock"></div>
 
-    <button class="btn" onclick="resetGame()">Nuova Partita</button>
     <a href="/" class="back-link">⬅ Torna alla Dashboard</a>
-</div>
 
 <script>
 const GRID_SIZE = 8;
-let gridData = Array(GRID_SIZE).fill(0).(() => Array(GRID_SIZE).fill(0));
+let gridData = [];
 let score = 0;
+let highScore = localStorage.getItem('blockblast_hi') || 452948;
+document.getElementById('high-score').textContent = highScore;
+
 let currentPieces = [];
 
-// Forme geometriche classiche stile Block Blast
+// Forme geometriche avanzate stile Block Blast
 const SHAPES = [
     [[1]], // Singolo
     [[1, 1]], // Linea 2
     [[1, 1, 1]], // Linea 3
+    [[1, 1, 1, 1]], // Linea 4
     [[1, 1], [1, 1]], // Quadrato 2x2
     [[1, 0], [1, 1]], // L-shape
+    [[0, 1], [1, 1]], // L invertita
+    [[1, 1, 1], [0, 1, 0]], // T-shape
+    [[1, 1, 0], [0, 1, 1]] // Z-shape
 ];
 
-const THEMES = ['', 'theme-mono', 'theme-cyber', 'theme-matrix'];
-let currentThemeIndex = 0;
-
-function changeTheme() {
-    document.body.className = THEMES[currentThemeIndex];
-    const names = ['Rosso & Blu Classico', 'Bianco & Nero Minimal', 'Cyber Neon', 'Matrix Verde'];
-    document.getElementById('themeName').textContent = 'Stile: ' + names[currentThemeIndex];
-    currentThemeIndex = (currentThemeIndex + 1) % THEMES.length;
+function initGrid() {
+    gridData = [];
+    for (let r = 0; r < GRID_SIZE; r++) {
+        gridData[r] = [];
+        for (let c = 0; c < GRID_SIZE; c++) {
+            gridData[r][c] = 0;
+        }
+    }
+    renderGrid();
 }
 
-function initGrid() {
+function renderGrid() {
     const gridEl = document.getElementById('grid');
     gridEl.innerHTML = '';
     for (let r = 0; r < GRID_SIZE; r++) {
-        for (let c = 0
-  
+        for (let c = 0; c < GRID_SIZE; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell' + (gridData[r][c] ? ' filled' : '');
+            // Clicca per posizionare il pezzo selezionato
+            cell.onclick = () => tryPlacePiece(r, c);
+            gridEl.appendChild(cell);
+        }
+    }
+}
+
+let selectedPieceIndex = null;
+
+function generatePieces() {
+    currentPieces = [];
+    const dock = document.getElementById('dock');
+    dock.innerHTML = '';
+
+    for (let i = 0; i < 3; i++) {
+        const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+        currentPieces.push(shape);
+
+        const pieceEl = document.createElement('div');
+        pieceEl.className = 'mini-piece';
+        pieceEl.style.gridTemplateColumns = `repeat(${shape[0].length}, 18px)`;
+        
+        shape.forEach(row => {
+            row.forEach(val => {
+                const mCell = document.createElement('div');
+                mCell.className = 'mini-cell' + (val ? ' active' : '');
+                pieceEl.appendChild(mCell);
+            });
+        });
+
+        pieceEl.onclick = () => {
+            selectedPieceIndex = i;
+            highlightPiece(i);
+        };
+        dock.appendChild(pieceEl);
+    }
+}
+
+function highlightPiece(index) {
+    const dockItems = document.getElementById('dock').children;
+    for (let i = 0; i < dockItems.length; i++) {
+        dockItems[i].style.background = (i === index) ? 'rgba(255,255,255,0.15)' : 'transparent';
+    }
+}
+
+function tryPlacePiece(r, c) {
+    if (selectedPieceIndex === null || !currentPieces[selectedPieceIndex]) return;
+    const shape = currentPieces[selectedPieceIndex];
+
+    // Controlla se il pezzo entra nei limiti della griglia e non si sovrappone
+    let canPlace = true;
+    for (let pr = 0; pr < shape.length; pr++) {
+        for (let pc = 0; pc < shape[pr].length; pc++) {
+            if (shape[pr][pc]) {
+                let targetR = r + pr;
+                let targetC = c + pc;
+                if (targetR >= GRID_SIZE || targetC >= GRID_SIZE || gridData[targetR][targetC] !== 0) {
+                    canPlace = false;
+                }
+            }
+        }
+    }
+
+    if (canPlace) {
+        // Inserisci il pezzo nella griglia
+        for (let pr = 0; pr < shape.length; pr++) {
+            for (let pc = 0; pc < shape[pr].length; pc++) {
+                if (shape[pr][pc]) {
+                    gridData[r + pr][c + pc] = 1;
+                }
+            }
+        }
+
+        score += shape.flat().reduce((a, b) => a + b, 0) * 15;
+        document.getElementById('score').textContent = score;
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('blockblast_hi', highScore);
+            document.getElementById('high-score').textContent = highScore;
+        }
+
+        currentPieces[selectedPieceIndex] = null;
+        selectedPieceIndex = null;
+
+        checkClears();
+        renderGrid();
+
+        // Se tutti e 3 i pezzi sono stati usati, genera un nuovo set!
+        if (currentPieces.every(p => p === null)) {
+            generatePieces();
+        }
+    }
+}
+
+function checkClears() {
+    // Controlla righe complete
+    for (let r = 0; r < GRID_SIZE; r++) {
+        if (gridData[r].every(cell => cell === 1)) {
+            gridData[r] = Array(GRID_SIZE).fill(0);
+            score += 150;
+        }
+    }
+    // Controlla colonne complete
+    for (let c = 0; c < GRID_SIZE; c++) {
+        let fullCol = true;
+        for (let r = 0; r < GRID_SIZE; r++) {
+            if (gridData[r][c] === 0) fullCol = false;
+        }
+        if (fullCol) {
+            for (let r = 0; r < GRID_SIZE; r++) gridData[r][c] = 0;
+            score += 150;
+        }
+    }
+    document.getElementById('score').textContent = score;
+}
+
+function resetGame() {
+    score = 0;
+    document.getElementById('score').textContent = score;
+    selectedPieceIndex = null;
+    initGrid();
+    generatePieces();
+}
+
+// Avvio gioco
+initGrid();
+generatePieces();
+</script>
+</body>
+</html>
