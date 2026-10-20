@@ -34,7 +34,7 @@ def log_ip_access(ip, user_agent):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO ip_logs (ip, user_agent) VALUES (?, ?)", (ip, user_agent))
-    cutoff_date = datetime.now() - timedelta(days=1)
+    cutoff_date = datetime.now() - timedelta(days=10)
     cursor.execute("DELETE FROM ip_logs WHERE timestamp < ?", (cutoff_date,))
     conn.commit()
     conn.close()
@@ -42,7 +42,7 @@ def log_ip_access(ip, user_agent):
 def get_ip_history():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cutoff_date = datetime.now() - timedelta(days=1)
+    cutoff_date = datetime.now() - timedelta(days=10)
     cursor.execute("DELETE FROM ip_logs WHERE timestamp < ?", (cutoff_date,))
     conn.commit()
     cursor.execute("SELECT ip, user_agent, timestamp FROM ip_logs ORDER BY timestamp DESC")
@@ -211,6 +211,27 @@ def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('home'))
 
+# --- ROTTE DEI MINIGIOCHI ---
+
+@app.route('/game/platformer')
+def game_platformer():
+    client_ip = get_client_ip()
+    log_ip_access(client_ip, request.user_agent.string)
+    return render_template('games/platformer.html')
+
+@app.route('/game/lucchetto')
+def game_lucchetto():
+    client_ip = get_client_ip()
+    log_ip_access(client_ip, request.user_agent.string)
+    return render_template('games/lucchetto.html')
+
+@app.route('/game/blockblast')
+def game_blockblast():
+    client_ip = get_client_ip()
+    log_ip_access(client_ip, request.user_agent.string)
+    return render_template('games/blockblast.html')
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+                                      
