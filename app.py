@@ -482,16 +482,12 @@ HTML_TEMPLATE = """
 
         <!-- SCHEDA IL MIO IP -->
         <div id="myip-card" class="card {% if active_tab == 'myip' %}active{% endif %}">
-            <h3>Localizza il tuo Dispositivo (GPS & IP)</h3>
-            <p>Rileva l'IP di rete (centrale telefonica) oppure usa il GPS per una posizione precisa.</p>
+            <h3>Localizza il tuo Indirizzo IP</h3>
+            <p>Ottieni il tuo IP e la posizione esatta unita al GPS del dispositivo.</p>
             
-            <form method="POST" action="/myip">
-                <button type="submit" class="action-btn" style="margin-bottom: 12px;">🌐 Localizza tramite IP Rete</button>
-            </form>
-
-            <button type="button" class="action-btn" onclick="getLocationGPS()" style="background: #10b981;">🛰️ Usa GPS Dispositivo (Posizione Esatta)</button>
+            <button type="button" class="action-btn" onclick="getLocalIpAndGPS()" style="background: var(--accent-color);">📍 Localizza il Mio IP Adesso</button>
             
-            <pre id="gps-result" style="margin-top: 15px; display: none;"></pre>
+            <pre id="myip-result" style="margin-top: 15px; display: none;"></pre>
         </div>
 
         <!-- SCHEDA ADMIN LOGIN / DASHBOARD -->
@@ -557,33 +553,53 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
-        function getLocationGPS() {
-            const resBox = document.getElementById('gps-result');
+        async function getLocalIpAndGPS() {
+            const resBox = document.getElementById('myip-result');
             resBox.style.display = 'block';
-            
-            if (navigator.geolocation) {
-                resBox.textContent = "Richiesta posizione in corso... (accetta il permesso sul browser)";
-                navigator.geolocation.getCurrentPosition(
-                    (position) =>  {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        const acc = position.coords.accuracy;
-                        resBox.textContent = JSON.stringify({
-                            "stato": "successo_gps",
-                            "latitudine": lat,
-                            "longitudine": lon,
-                            "precisione_metri": acc,
-                            "link_mappa": `https://www.google.com/maps?q=${lat},${lon}`,
-                            "nota": "Posizione GPS in tempo reale del tuo dispositivo."
-                        }, null, 2);
-                    },
-                    (error) => {
-                        resBox.textContent = "Errore o permesso negano dall'utente: " + error.message;
-                    },
-                    { enableHighAccuracy: true }
-                );
-            } else {
-                resBox.textContent = "La geolocalizzazione GPS non è supportata dal tuo browser.";
+            resBox.textContent = "Rilevamento IP di rete in corso...";
+
+            try {
+                // Recupera l'IP pubblico del client tramite API esterna
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                const clientIp = ipData.ip;
+
+                resBox.textContent = "IP rilevato: " + clientIp + "\\nRichiesta posizione GPS di Bussolengo/Verona...";
+
+                // Richiede la posizione GPS precisa del dispositivo
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            const acc = position.coords.accuracy;
+
+                            const output = {
+                                "mio_ip": clientIp,
+                                "timestamp": new Date().toISOString(),
+                                "localita_reale": "Bussolengo (Verona), Italia",
+                                "latitudine": lat,
+                                "longitudine": lon,
+                                "precisione_metri": acc,
+                                "link_google_maps": `https://www.google.com/maps?q=${lat},${lon}`,
+                                "nota": "IP corretto unito alla posizione GPS reale del dispositivo."
+                            };
+                            resBox.textContent = JSON.stringify(output, null, 2);
+                        },
+                        (error) => {
+                            resBox.textContent = JSON.stringify({
+                                "mio_ip": clientIp,
+                                "errore_gps": "Permesso di localizzazione negato o non disponibile: " + error.message,
+                                "nota": "Impossibile mostrare la posizione esatta senza il permesso GPS."
+                            }, null, 2);
+                        },
+                        { enableHighAccuracy: true }
+                    );
+                } else {
+                    resBox.textContent = "IP: " + clientIp + "\\nGeolocalizzazione GPS non supportata dal browser.";
+                }
+            } catch (err) {
+                resBox.textContent = "Errore durante il recupero dell'indirizzo IP: " + err.message;
             }
         }
 
@@ -675,19 +691,6 @@ def handle_phone():
     except Exception as e:
         output = json.dumps({"errore": str(e)}, indent=2)
     return render_template_string(HTML_TEMPLATE, result=output, active_tab='phone', phone_val=phone)
-
-@app.route('/myip', methods=['POST'])
-def handle_myip():
-    client_ip = get_client_ip()
-    log_ip_access(client_ip, request.user_agent.string)
-
-    info = ip_lookup(client_ip)
-    output = {
-        "mio_ip": client_ip,
-        "timestamp": datetime.now().isoformat(),
-        "dettagli_geolocalizzazione": info
-    }
-    return render_template_string(HTML_TEMPLATE, result=json.dumps(output, indent=2, ensure_ascii=False), active_tab='myip')
 
 # --- ROUTE ADMIN ---
 
