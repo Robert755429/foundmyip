@@ -108,7 +108,7 @@ def analyze_phone(raw):
         }
     }
 
-# --- TEMPLATE HTML PULITO E SENZA FEEDBACK ---
+# --- TEMPLATE HTML ---
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="it">
@@ -245,3 +245,150 @@ HTML_TEMPLATE = """
             background: var(--input-bg);
             color: var(--text-color);
             border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button.action-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.action-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        pre {
+            background: #020617;
+            color: #38bdf8;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body class="{{ theme }}">
+    <div class="container">
+        <header>
+            <h1>🔍 OSINT Dashboard</h1>
+            <div class="theme-selector">
+                <select id="themeSelect" onchange="changeTheme(this.value)">
+                    <option value="cyber">Cyber Viola</option>
+                    <option value="matrix">Matrix Verde</option>
+                    <option value="ocean">Oceano Blu</option>
+                    <option value="light">Tema Chiaro</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn {% if active_tab == 'phone' %}active{% endif %}" onclick="switchTab('phone')">📱 Telefono</button>
+            <button class="tab-btn {% if active_tab == 'ip' %}active{% endif %}" onclick="switchTab('ip')">🌐 Indirizzo IP</button>
+        </div>
+
+        <!-- SCHEDA TELEFONO -->
+        <div id="phone-card" class="card {% if active_tab == 'phone' %}active{% endif %}">
+            <h3>Analizzatore Numeri</h3>
+            <form method="POST" action="/phone">
+                <label>Inserisci Numero (es. +393792638352)</label>
+                <input type="text" name="phone" placeholder="+39..." value="{{ phone_val or '' }}" required>
+                <button type="submit" class="action-btn">Avvia Analisi Telefono</button>
+            </form>
+        </div>
+
+        <!-- SCHEDA IP -->
+        <div id="ip-card" class="card {% if active_tab == 'ip' %}active{% endif %}">
+            <h3>Lookup IP & Porte</h3>
+            <form method="POST" action="/ip">
+                <label>Inserisci IP (es. 8.8.8.8)</label>
+                <input type="text" name="ip" placeholder="8.8.8.8..." value="{{ ip_val or '' }}" required>
+                <button type="submit" class="action-btn">Scansiona Indirizzo IP</button>
+            </form>
+        </div>
+
+        {% if result %}
+        <div class="card active">
+            <h3>Risultato Elaborazione:</h3>
+            <pre>{{ result }}</pre>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.getElementById('phone-card').classList.remove('active');
+            document.getElementById('ip-card').classList.remove('active');
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(b => b.classList.remove('active'));
+
+            if(tab === 'phone') {
+                document.getElementById('phone-card').classList.add('active');
+                btns[0].classList.add('active');
+            } else {
+                document.getElementById('ip-card').classList.add('active');
+                btns[1].classList.add('active');
+            }
+        }
+
+        function changeTheme(theme) {
+            document.body.className = '';
+            if(theme !== 'cyber') {
+                document.body.classList.add('theme-' + theme);
+            }
+            localStorage.setItem('selected_theme', theme);
+        }
+
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('selected_theme');
+            if(savedTheme) {
+                document.getElementById('themeSelect').value = savedTheme;
+                changeTheme(savedTheme);
+            }
+        }
+    </script>
+</body>
+</html>
+"""
+
+@app.route('/')
+def home():
+    return render_template_string(HTML_TEMPLATE, result=None, active_tab='phone', theme='')
+
+@app.route('/ip', methods=['POST'])
+def handle_ip():
+    ip = request.form.get('ip', '').strip()
+    info = ip_lookup(ip)
+    porte_comuni = [21,22,23,25,53,80,110,143,443,3306,3389,5900,8080]
+    scan = scan_ports(ip, porte_comuni)
+    output = {
+        "ip": ip,
+        "timestamp": datetime.now().isoformat(),
+        "lookup": info,
+        "porte": scan
+    }
+    return render_template_string(HTML_TEMPLATE, result=json.dumps(output, indent=2, ensure_ascii=False), active_tab='ip', ip_val=ip)
+
+@app.route('/phone', methods=['POST'])
+def handle_phone():
+    phone = request.form.get('phone', '').strip()
+    try:
+        res = analyze_phone(phone)
+        output = json.dumps(res, indent=2, ensure_ascii=False)
+    except Exception as e:
+        output = json.dumps({"errore": str(e)}, indent=2)
+    return render_template_string(HTML_TEMPLATE, result=output, active_tab='phone', phone_val=phone)
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
