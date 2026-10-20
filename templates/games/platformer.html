@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Mario Retro - FoundmyIp Edition</title>
+    <title>Super Mario Retro - FoundmyIp</title>
     <style>
         * {
             box-sizing: border-box;
@@ -16,7 +16,7 @@
             padding: 0;
             background-color: #0f172a;
             color: #ffffff;
-            font-family: 'Press Start 2P', 'Courier New', monospace, sans-serif;
+            font-family: 'Courier New', monospace, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -47,7 +47,6 @@
             font-size: 11px;
             color: #fff;
             box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
-            line-height: 1.4;
         }
 
         .hud div span {
@@ -58,18 +57,16 @@
 
         canvas {
             background-color: #5c94fc;
-            border-left: 3px solid #e69c24;
-            border-right: 3px solid #e69c24;
-            border-bottom: 3px solid #e69c24;
+            border: 3px solid #e69c24;
+            border-top: none;
             border-radius: 0 0 8px 8px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.6);
             image-rendering: pixelated;
             width: 100%;
-            max-height: 480px;
+            max-height: 400px;
             touch-action: none;
         }
 
-        /* Overlay di Pausa e Game Over */
         .overlay {
             position: absolute;
             top: 0;
@@ -83,7 +80,6 @@
             justify-content: center;
             z-index: 10;
             border-radius: 8px;
-            color: #fff;
             text-align: center;
         }
 
@@ -109,12 +105,6 @@
             text-transform: uppercase;
         }
 
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #996200;
-        }
-
-        /* Controlli Touch On-Screen */
         .touch-controls {
             display: none;
             width: 100%;
@@ -126,18 +116,10 @@
         }
 
         @media (max-width: 768px) {
-            .touch-controls {
-                display: flex;
-            }
-            .hud {
-                font-size: 9px;
-            }
+            .touch-controls { display: flex; }
         }
 
-        .dpad, .action-btns {
-            display: flex;
-            gap: 10px;
-        }
+        .dpad, .action-btns { display: flex; gap: 10px; }
 
         .t-btn {
             width: 55px;
@@ -153,20 +135,14 @@
             touch-action: manipulation;
         }
 
-        .t-btn:active {
-            background: rgba(230, 156, 36, 0.7);
-        }
-
         .back-link {
             margin-top: 15px;
             color: #38bdf8;
             text-decoration: none;
-            font-size: 10px;
+            font-size: 11px;
+            font-weight: bold;
         }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
+        .back-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -177,16 +153,14 @@
         <div>MONETE<span id="coins">🪙 x00</span></div>
         <div>LIVELLO<span id="level">01/50</span></div>
         <div>TEMPO<span id="time">300</span></div>
-        <div>
-            <button class="btn" style="padding: 4px 8px; margin: 0; font-size: 9px;" onclick="togglePause()">⏸ PAUSA</button>
-        </div>
+        <div><button class="btn" style="padding: 4px 8px; margin: 0; font-size: 9px;" onclick="togglePause()">⏸</button></div>
     </div>
 
     <canvas id="gameCanvas" width="800" height="400"></canvas>
 
     <div id="gameOverlay" class="overlay" style="display: none;">
         <h1 id="overlayTitle">PAUSA</h1>
-        <p id="overlayMessage">Premi per riprendere il gioco</p>
+        <p id="overlayMessage">Premi per riprendere</p>
         <button id="overlayBtn" class="btn" onclick="resumeGame()">RIPRENDI</button>
     </div>
 
@@ -196,7 +170,7 @@
             <div class="t-btn" id="btnRight">▶</div>
         </div>
         <div class="action-btns">
-            <div class="t-btn" id="btnJump" style="background: rgba(229,37,33,0.5);">▲</div>
+            <div class="t-btn" id="btnJump" style="background: rgba(229,37,33,0.6);">▲</div>
         </div>
     </div>
 
@@ -207,54 +181,41 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// --- SISTEMA AUDIO WEB (EFFETTI RETRO SINTETIZZATI) ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-function playSound(type) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    const now = audioCtx.currentTime;
-
-    if (type === 'jump') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-        osc.start(now);
-        osc.stop(now + 0.15);
-    } else if (type === 'coin') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(987.77, now); // B5
-        osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.start(now);
-        osc.stop(now + 0.3);
-    } else if (type === 'stomp') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(120, now);
-        osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.start(now);
-        osc.stop(now + 0.1);
-    } else if (type === 'powerup') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.linearRampToValueAtTime(800, now + 0.2);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-        osc.start(now);
-        osc.stop(now + 0.2);
+let audioCtx = null;
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 }
 
-// --- COSTANTI DI GIOCO ---
+function playSound(type) {
+    try {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'jump') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.start(now); osc.stop(now + 0.15);
+        } else if (type === 'coin') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(987.77, now);
+            osc.frequency.setValueAtTime(1318.51, now + 0.08);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        }
+    } catch(e) {}
+}
+
 const TILE_SIZE = 32;
 const GRAVITY = 0.45;
 const MAX_LEVELS = 50;
@@ -268,7 +229,246 @@ let isGameOver = false;
 let cameraX = 0;
 let timerInterval = null;
 
-// --- INPUT HANDLER ---
 const keys = { left: false, right: false, jump: false };
 
-  
+window.addEventListener('keydown', e => {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+        if (!keys.jump && mario.grounded && !isPaused && !isGameOver) {
+            mario.vy = -mario.jumpPower;
+            mario.grounded = false;
+            playSound('jump');
+        }
+        keys.jump = true;
+    }
+    if (e.code === 'KeyP') togglePause();
+});
+
+window.addEventListener('keyup', e => {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.jump = false;
+});
+
+function setupTouchBtn(id, keyProp) {
+    const btn = document.getElementById(id);
+    if(!btn) return;
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (keyProp === 'jump') {
+            if (mario.grounded && !isPaused && !isGameOver) {
+                mario.vy = -mario.jumpPower;
+                mario.grounded = false;
+                playSound('jump');
+            }
+            keys.jump = true;
+        } else {
+            keys[keyProp] = true;
+        }
+    });
+    btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys[keyProp] = false;
+    });
+}
+setupTouchBtn('btnLeft', 'left');
+setupTouchBtn('btnRight', 'right');
+setupTouchBtn('btnJump', 'jump');
+
+const mario = { x: 50, y: 200, w: 28, h: 32, vx: 0, vy: 0, speed: 3.8, jumpPower: 10.5, grounded: false, facing: 'right' };
+let mapBlocks = [];
+let enemies = [];
+let castleX = 0;
+
+function generateLevel(lvlNum) {
+    mapBlocks = [];
+    enemies = [];
+    cameraX = 0;
+    levelTime = Math.max(180, 320 - lvlNum * 2);
+
+    const levelWidth = 60 + lvlNum * 8;
+    const groundY = 10;
+
+    for (let x = 0; x < levelWidth; x++) {
+        const isHole = (lvlNum > 1) && (x > 15 && x < levelWidth - 15) && (x % 15 === 0);
+        if (!isHole) {
+            mapBlocks.push({ x: x * TILE_SIZE, y: groundY * TILE_SIZE, type: 'ground' });
+            mapBlocks.push({ x: x * TILE_SIZE, y: (groundY + 1) * TILE_SIZE, type: 'ground' });
+        }
+    }
+
+    for (let x = 10; x < levelWidth - 20; x++) {
+        if (x % 16 === 0) {
+            mapBlocks.push({ x: x * TILE_SIZE, y: (groundY - 1) * TILE_SIZE, type: 'pipe_top' });
+            mapBlocks.push({ x: x * TILE_SIZE, y: (groundY - 2) * TILE_SIZE, type: 'pipe_body' });
+        }
+        if (x % 6 === 0) {
+            mapBlocks.push({ x: x * TILE_SIZE, y: (groundY - 4) * TILE_SIZE, type: 'question', used: false, hasItem: 'coin' });
+            enemies.push({ x: x * TILE_SIZE, y: (groundY - 1) * TILE_SIZE, w: 28, h: 28, vx: -1.2, alive: true });
+        }
+    }
+
+    castleX = (levelWidth - 6) * TILE_SIZE;
+    mario.x = 60;
+    mario.y = (groundY - 2) * TILE_SIZE;
+    mario.vx = 0; mario.vy = 0;
+
+    document.getElementById('level').textContent = `${lvlNum < 10 ? '0' + lvlNum : lvlNum}/50`;
+    
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        if (!isPaused && !isGameOver) {
+            levelTime--;
+            document.getElementById('time').textContent = levelTime;
+            if (levelTime <= 0) handleGameOver("TEMPO SCADUTO!");
+        }
+    }, 1000);
+}
+
+function drawSprite(type, x, y, state) {
+    ctx.save();
+    ctx.translate(Math.floor(x - cameraX), Math.floor(y));
+
+    if (type === 'mario') {
+        ctx.fillStyle = '#e52521'; ctx.fillRect(4, 0, 20, 8);
+        ctx.fillStyle = '#6b4400'; ctx.fillRect(2, 8, 24, 6);
+        ctx.fillStyle = '#f7d840'; ctx.fillRect(6, 6, 6, 4);
+        ctx.fillStyle = '#e52521'; ctx.fillRect(4, 14, 20, 10);
+        ctx.fillStyle = '#0020c2'; ctx.fillRect(6, 20, 16, 12);
+    } else if (type === 'ground') {
+        ctx.fillStyle = '#d84800'; ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+        ctx.fillStyle = '#fcb070'; ctx.fillRect(2, 2, TILE_SIZE - 4, 4);
+    } else if (type === 'question') {
+        ctx.fillStyle = state ? '#808080' : '#fcb000'; ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+        if (!state) { ctx.fillStyle = '#fff'; ctx.font = 'bold 18px sans-serif'; ctx.fillText('?', 10, 23); }
+    } else if (type === 'pipe_top' || type === 'pipe_body') {
+        ctx.fillStyle = '#00a800'; ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+        ctx.fillStyle = '#80d010'; ctx.fillRect(2, 2, 6, TILE_SIZE - 4);
+    } else if (type === 'goomba') {
+        ctx.fillStyle = '#a81000'; ctx.fillRect(4, 4, 20, 16);
+        ctx.fillStyle = '#000'; ctx.fillRect(6, 20, 6, 8); ctx.fillRect(16, 20, 6, 8);
+    }
+    ctx.restore();
+}
+
+function update() {
+    if (isPaused || isGameOver) return;
+
+    if (keys.left) { mario.vx = -mario.speed; mario.facing = 'left'; }
+    else if (keys.right) { mario.vx = mario.speed; mario.facing = 'right'; }
+    else { mario.vx *= 0.8; }
+
+    mario.vy += GRAVITY;
+    mario.x += mario.vx; checkCollisionX();
+    mario.y += mario.vy; mario.grounded = false; checkCollisionY();
+
+    if (mario.x - cameraX > 350) cameraX = mario.x - 350;
+    if (mario.y > canvas.height + 50) handleGameOver("SEI CADUTO NEL VUOTO!");
+
+    enemies.forEach(e => {
+        if (!e.alive) return;
+        e.x += e.vx;
+        if (mario.x < e.x + e.w && mario.x + mario.w > e.x && mario.y < e.y + e.h && mario.y + mario.h > e.y) {
+            if (mario.vy > 0 && mario.y + mario.h - mario.vy <= e.y + 12) {
+                e.alive = false; mario.vy = -7; score += 200; playSound('jump');
+            } else {
+                handleGameOver("SEI STATO COLPITO!");
+            }
+        }
+    });
+
+    if (mario.x >= castleX) {
+        if (currentLevel < MAX_LEVELS) {
+            currentLevel++; score += 1000; playSound('coin'); generateLevel(currentLevel);
+        } else {
+            handleGameOver("HAI COMPLETATO TUTTI I 50 LIVELLI!");
+        }
+    }
+
+    document.getElementById('score').textContent = String(score).padStart(6, '0');
+    document.getElementById('coins').textContent = `🪙 x${String(coins).padStart(2, '0')}`;
+}
+
+function checkCollisionX() {
+    mapBlocks.forEach(b => {
+        if (mario.x < b.x + TILE_SIZE && mario.x + mario.w > b.x && mario.y < b.y + TILE_SIZE && mario.y + mario.h > b.y) {
+            if (mario.vx > 0) mario.x = b.x - mario.w;
+            else if (mario.vx < 0) mario.x = b.x + TILE_SIZE;
+        }
+    });
+}
+
+function checkCollisionY() {
+    mapBlocks.forEach(b => {
+        if (mario.x < b.x + TILE_SIZE && mario.x + mario.w > b.x && mario.y < b.y + TILE_SIZE && mario.y + mario.h > b.y) {
+            if (mario.vy > 0) {
+                mario.y = b.y - mario.h; mario.vy = 0; mario.grounded = true;
+            } else if (mario.vy < 0) {
+                mario.y = b.y + TILE_SIZE; mario.vy = 0;
+                if (b.type === 'question' && !b.used) {
+                    b.used = true; coins++; score += 100; playSound('coin');
+                }
+            }
+        }
+    });
+}
+
+function render() {
+    ctx.fillStyle = '#5c94fc';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    mapBlocks.forEach(b => {
+        if (b.x + TILE_SIZE > cameraX && b.x < cameraX + canvas.width) {
+            drawSprite(b.type, b.x, b.y, b.used);
+        }
+    });
+
+    ctx.fillStyle = '#d84800';
+    ctx.fillRect(castleX - cameraX, 5 * TILE_SIZE, 4 * TILE_SIZE, 5 * TILE_SIZE);
+
+    enemies.forEach(e => {
+        if (e.alive && e.x + e.w > cameraX && e.x < cameraX + canvas.width) {
+            drawSprite('goomba', e.x, e.y);
+        }
+    });
+
+    drawSprite('mario', mario.x, mario.y);
+}
+
+function togglePause() {
+    if (isGameOver) return;
+    isPaused = !isPaused;
+    document.getElementById('gameOverlay').style.display = isPaused ? 'flex' : 'none';
+}
+
+function resumeGame() {
+    isPaused = false;
+    document.getElementById('gameOverlay').style.display = 'none';
+}
+
+function handleGameOver(reason) {
+    isGameOver = true;
+    clearInterval(timerInterval);
+    document.getElementById('overlayTitle').textContent = "GAME OVER";
+    document.getElementById('overlayMessage').textContent = reason;
+    document.getElementById('overlayBtn').textContent = "RIPROVA";
+    document.getElementById('overlayBtn').onclick = () => {
+        isGameOver = false;
+        generateLevel(currentLevel);
+        document.getElementById('gameOverlay').style.display = 'none';
+    };
+    document.getElementById('gameOverlay').style.display = 'flex';
+}
+
+function gameLoop() {
+    update();
+    render();
+    requestAnimationFrame(gameLoop);
+}
+
+generateLevel(1);
+gameLoop();
+</script>
+</body>
+</html>
