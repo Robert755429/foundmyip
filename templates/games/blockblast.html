@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Block Blast Colors - FoundmyIp</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-1: #ef4444; /* Rosso */
+            --accent-2: #3b82f6; /* Blu */
+            --grid-bg: #090d16;
+            --border-color: #334155;
+        }
+
+        /* Temi cromatici dinamici */
+        body.theme-mono {
+            --bg-color: #121212;
+            --card-bg: #222222;
+            --text-color: #ffffff;
+            --accent-1: #ffffff;
+            --accent-2: #888888;
+            --grid-bg: #000000;
+            --border-color: #444444;
+        }
+
+        body.theme-cyber {
+            --bg-color: #0f051d;
+            --card-bg: #200c3f;
+            --text-color: #f3e8ff;
+            --accent-1: #ec4899;
+            --accent-2: #8b5cf6;
+            --grid-bg: #090214;
+            --border-color: #4c1d95;
+        }
+
+        body.theme-matrix {
+            --bg-color: #022c22;
+            --card-bg: #064e3b;
+            --text-color: #d1fae5;
+            --accent-1: #10b981;
+            --accent-2: #34d399;
+            --grid-bg: #011c16;
+            --border-color: #065f46;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .score-box span {
+            color: var(--accent-1);
+        }
+
+        .theme-indicator {
+            font-size: 0.8rem;
+            color: var(--accent-2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        /* Griglia di gioco 8x8 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            background: var(--grid-bg);
+            padding: 8px;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            width: 35px;
+            height: 35px;
+            background: var(--card-bg);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .cell.filled-1 {
+            background: var(--accent-1);
+            box-shadow: 0 0 8px var(--accent-1);
+        }
+
+        .cell.filled-2 {
+            background: var(--accent-2);
+            box-shadow: 0 0 8px var(--accent-2);
+        }
+
+        /* Box pezzi da posizionare */
+        .pieces-dock {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            background: var(--grid-bg);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            min-height: 90px;
+            align-items: center;
+        }
+
+        .mini-piece {
+            display: grid;
+            gap: 2px;
+            cursor: pointer;
+            padding: 5px;
+            border: 2px dashed transparent;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .mini-piece:hover {
+            border-color: var(--accent-1);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .mini-cell {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+        }
+
+        .mini-cell.active-1 { background: var(--accent-1); }
+        .mini-cell.active-2 { background: var(--accent-2); }
+
+        .btn {
+            margin-top: 15px;
+            background: var(--accent-1);
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .back-link {
+            margin-top: 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="theme-cyber">
+
+<div class="game-container">
+    <div class="header">
+        <div>BLOCK BLAST</div>
+        <div class="score-box">PUNTI: <span id="score">0</span></div>
+    </div>
+    
+    <div class="theme-indicator" id="themeName">Stile: Cyber Neon</div>
+
+    <!-- Griglia di Gioco -->
+    <div class="grid" id="grid"></div>
+
+    <!-- Pezzi disponibili -->
+    <div class="pieces-dock" id="dock"></div>
+
+    <button class="btn" onclick="resetGame()">Nuova Partita</button>
+    <a href="/" class="back-link">⬅ Torna alla Dashboard</a>
+</div>
+
+<script>
+const GRID_SIZE = 8;
+let gridData = Array(GRID_SIZE).fill(0).(() => Array(GRID_SIZE).fill(0));
+let score = 0;
+let currentPieces = [];
+
+// Forme geometriche classiche stile Block Blast
+const SHAPES = [
+    [[1]], // Singolo
+    [[1, 1]], // Linea 2
+    [[1, 1, 1]], // Linea 3
+    [[1, 1], [1, 1]], // Quadrato 2x2
+    [[1, 0], [1, 1]], // L-shape
+];
+
+const THEMES = ['', 'theme-mono', 'theme-cyber', 'theme-matrix'];
+let currentThemeIndex = 0;
+
+function changeTheme() {
+    document.body.className = THEMES[currentThemeIndex];
+    const names = ['Rosso & Blu Classico', 'Bianco & Nero Minimal', 'Cyber Neon', 'Matrix Verde'];
+    document.getElementById('themeName').textContent = 'Stile: ' + names[currentThemeIndex];
+    currentThemeIndex = (currentThemeIndex + 1) % THEMES.length;
+}
+
+function initGrid() {
+    const gridEl = document.getElementById('grid');
+    gridEl.innerHTML = '';
+    for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0
+  
