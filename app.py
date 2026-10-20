@@ -157,7 +157,7 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSINT Dashboard Pro</title>
+    <title>FoundmyIp</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -426,7 +426,7 @@ HTML_TEMPLATE = """
 <body class="{{ theme }}">
     <div class="container">
         <header>
-            <h1>🔍 OSINT Dashboard</h1>
+            <h1>🌐 FoundmyIp</h1>
             <div class="theme-selector">
                 <select id="themeSelect" onchange="changeTheme(this.value)">
                     <option value="cyber">Cyber Viola</option>
@@ -509,7 +509,7 @@ HTML_TEMPLATE = """
     </div>
 
     <footer>
-        <p>&copy; 2026 OSINT Dashboard. Tutti i diritti riservati.</p>
+        <p>&copy; 2026 FoundmyIp. Tutti i diritti riservati.</p>
         <p>Licenza: <strong>MIT License</strong> | Copyright &copy; <strong>Nix</strong></p>
         <p>
             <a href="#" onclick="openModal('privacyModal')">Informativa sulla Privacy & Cookie</a> | 
@@ -521,7 +521,7 @@ HTML_TEMPLATE = """
     <div id="cookie-overlay">
         <div class="cookie-box">
             <h3>🔒 Accettazione Cookie Richiesta</h3>
-            <p>Per poter utilizzare la OSINT Dashboard e usufruire dei nostri strumenti, è obbligatorio accettare l'utilizzo dei cookie tecnici e l'informativa sulla privacy.</p>
+            <p>Per poter utilizzare FoundmyIp e usufruire dei nostri strumenti, è obbligatorio accettare l'utilizzo dei cookie tecnici e l'informativa sulla privacy.</p>
             <button class="action-btn" onclick="acceptCookies()">Accetta e Prosegui</button>
             <p style="margin-top: 15px; font-size: 0.8rem;">
                 <a href="#" onclick="openModal('privacyModal')" style="color:var(--accent-color);">Leggi la Privacy Policy</a>
@@ -560,7 +560,7 @@ HTML_TEMPLATE = """
 
                 resBox.textContent = "IP rilevato: " + clientIp + "\\nRichiesta posizione GPS...";
 
-                if (navigator.geolocation) {
+if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             const lat = position.coords.latitude;
