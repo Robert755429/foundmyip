@@ -11,13 +11,9 @@ from flask import Flask, render_template_string, request, session, redirect, url
 
 app = Flask(__name__)
 
-# Segreto per le sessioni utente/admin
 app.secret_key = os.environ.get("SECRET_KEY", "chiave_segreta_di_default_cambiala_su_render")
-
-# Password Admin letta dalle variabili d'ambiente di Render
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Nicola11.")
 
-# --- DATABASE LOGS (Cronologia IP) ---
 DB_NAME = "ip_history.db"
 
 def init_db():
@@ -38,22 +34,17 @@ def log_ip_access(ip, user_agent):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO ip_logs (ip, user_agent) VALUES (?, ?)", (ip, user_agent))
-    
-    # Pulizia automatica: elimina record più vecchi di 10 giorni
     cutoff_date = datetime.now() - timedelta(days=10)
     cursor.execute("DELETE FROM ip_logs WHERE timestamp < ?", (cutoff_date,))
-    
     conn.commit()
     conn.close()
 
 def get_ip_history():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    
     cutoff_date = datetime.now() - timedelta(days=10)
     cursor.execute("DELETE FROM ip_logs WHERE timestamp < ?", (cutoff_date,))
     conn.commit()
-
     cursor.execute("SELECT ip, user_agent, timestamp FROM ip_logs ORDER BY timestamp DESC")
     rows = cursor.fetchall()
     conn.close()
@@ -61,8 +52,6 @@ def get_ip_history():
 
 init_db()
 
-
-# --- UTILS IP & PORTE ---
 def get_client_ip():
     if request.headers.getlist("X-Forwarded-For"):
         ip = request.headers.getlist("X-Forwarded-For")[0].split(',')[0].strip()
@@ -109,8 +98,6 @@ def scan_ports(ip, ports):
             risultati.append({"porta": p, "stato": "chiusa/filtrata", "rischio": "ok"})
     return risultati
 
-
-# --- PHONE ANALYZER ---
 MOBILE_PREFIX = {
     "330":"TIM","331":"TIM","333":"TIM","334":"TIM","335":"TIM","336":"TIM","337":"TIM","338":"TIM","339":"TIM","360":"TIM","361":"TIM","362":"TIM","363":"TIM","366":"TIM","368":"TIM",
     "340":"Vodafone","341":"Vodafone","342":"Vodafone","343":"Vodafone","345":"Vodafone","346":"Vodafone","347":"Vodafone","348":"Vodafone","349":"Vodafone",
@@ -164,8 +151,6 @@ def analyze_phone(raw):
         }
     }
 
-
-# --- TEMPLATE HTML ---
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="it">
@@ -355,35 +340,38 @@ HTML_TEMPLATE = """
             border: 1px solid #991b1b;
         }
 
-        #cookie-banner {
+        /* Overlay di blocco per i cookie */
+        #cookie-overlay {
+            display: none;
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            border-top: 2px solid var(--accent-color);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            z-index: 9999;
+            justify-content: center;
             align-items: center;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
-            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        #cookie-banner p {
-            margin: 0;
-            font-size: 0.85rem;
-            max-width: 80%;
+        .cookie-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        #cookie-banner button {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
+        .cookie-box h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+
+        .cookie-box p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
         }
 
         footer {
@@ -529,9 +517,16 @@ HTML_TEMPLATE = """
         </p>
     </footer>
 
-    <div id="cookie-banner" style="display: none;">
-        <p>Utilizziamo cookie tecnici per garantire le funzionalità del sito e registrare gli accessi (retention 10 giorni). <a href="#" onclick="openModal('privacyModal')" style="color:var(--accent-color);">Leggi la Privacy Policy</a>.</p>
-        <button onclick="acceptCookies()">Accetta e Chiudi</button>
+    <!-- OVERLAY BLOCCO COOKIE MANDATORIO -->
+    <div id="cookie-overlay">
+        <div class="cookie-box">
+            <h3>🔒 Accettazione Cookie Richiesta</h3>
+            <p>Per poter utilizzare la OSINT Dashboard e usufruire dei nostri strumenti, è obbligatorio accettare l'utilizzo dei cookie tecnici e l'informativa sulla privacy.</p>
+            <button class="action-btn" onclick="acceptCookies()">Accetta e Prosegui</button>
+            <p style="margin-top: 15px; font-size: 0.8rem;">
+                <a href="#" onclick="openModal('privacyModal')" style="color:var(--accent-color);">Leggi la Privacy Policy</a>
+            </p>
+        </div>
     </div>
 
     <div id="privacyModal" class="modal">
@@ -540,7 +535,7 @@ HTML_TEMPLATE = """
             <h3>Informativa sulla Privacy & Cookie Policy</h3>
             <p><strong>1. Trattamento dei Dati:</strong> Questo sito web registra gli indirizzi IP dei visitatori e i dati di navigazione basilari (User Agent) a fini di sicurezza.</p>
             <p><strong>2. Conservazione:</strong> Gli indirizzi IP memorizzati vengono eliminati automaticamente dopo 10 giorni.</p>
-            <p><strong>3. Cookie:</strong> Vengono utilizzati cookie di sessione necessari per l'autenticazione.</p>
+            <p><strong>3. Cookie:</strong> Vengono utilizzati cookie tecnici necessari per il funzionamento e l'autenticazione.</p>
         </div>
     </div>
 
@@ -559,14 +554,12 @@ HTML_TEMPLATE = """
             resBox.textContent = "Rilevamento IP di rete in corso...";
 
             try {
-                // Recupera l'IP pubblico del client tramite API esterna
                 const ipResponse = await fetch('https://api.ipify.org?format=json');
                 const ipData = await ipResponse.json();
                 const clientIp = ipData.ip;
 
-                resBox.textContent = "IP rilevato: " + clientIp + "\\nRichiesta posizione GPS di Bussolengo/Verona...";
+                resBox.textContent = "IP rilevato: " + clientIp + "\\nRichiesta posizione GPS...";
 
-                // Richiede la posizione GPS precisa del dispositivo
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
@@ -577,7 +570,6 @@ HTML_TEMPLATE = """
                             const output = {
                                 "mio_ip": clientIp,
                                 "timestamp": new Date().toISOString(),
-                                "localita_reale": "Bussolengo (Verona), Italia",
                                 "latitudine": lat,
                                 "longitudine": lon,
                                 "precisione_metri": acc,
@@ -627,7 +619,7 @@ HTML_TEMPLATE = """
 
         function acceptCookies() {
             localStorage.setItem('cookies_accepted', 'true');
-            document.getElementById('cookie-banner').style.display = 'none';
+            document.getElementById('cookie-overlay').style.display = 'none';
         }
 
         function openModal(id) {
@@ -645,16 +637,15 @@ HTML_TEMPLATE = """
                 changeTheme(savedTheme);
             }
 
+            // Blocca il sito se non ha accettato i cookie
             if(!localStorage.getItem('cookies_accepted')) {
-                document.getElementById('cookie-banner').style.display = 'flex';
+                document.getElementById('cookie-overlay').style.display = 'flex';
             }
         }
     </script>
 </body>
 </html>
 """
-
-# --- ROUTE APP ---
 
 @app.route('/')
 def home():
@@ -692,8 +683,6 @@ def handle_phone():
         output = json.dumps({"errore": str(e)}, indent=2)
     return render_template_string(HTML_TEMPLATE, result=output, active_tab='phone', phone_val=phone)
 
-# --- ROUTE ADMIN ---
-
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
     input_password = request.form.get('password', '').strip()
@@ -717,7 +706,6 @@ def admin_login():
 def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('home'))
-
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
