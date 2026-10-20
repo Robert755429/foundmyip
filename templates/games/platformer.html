@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Mario Retro - FoundmyIp Edition</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0f172a;
+            color: #ffffff;
+            font-family: 'Press Start 2P', 'Courier New', monospace, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            padding: 10px;
+        }
+
+        .hud {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #000;
+            padding: 12px 16px;
+            border: 3px solid #e69c24;
+            border-radius: 8px 8px 0 0;
+            font-size: 11px;
+            color: #fff;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+            line-height: 1.4;
+        }
+
+        .hud div span {
+            color: #f7d840;
+            display: block;
+            margin-top: 2px;
+        }
+
+        canvas {
+            background-color: #5c94fc;
+            border-left: 3px solid #e69c24;
+            border-right: 3px solid #e69c24;
+            border-bottom: 3px solid #e69c24;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            image-rendering: pixelated;
+            width: 100%;
+            max-height: 480px;
+            touch-action: none;
+        }
+
+        /* Overlay di Pausa e Game Over */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 8px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .overlay h1 {
+            color: #e52521;
+            text-shadow: 3px 3px 0 #000;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: #e69c24;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 4px 0 #996200;
+            margin-top: 15px;
+            text-transform: uppercase;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #996200;
+        }
+
+        /* Controlli Touch On-Screen */
+        .touch-controls {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding: 0 10px;
+        }
+
+        @media (max-width: 768px) {
+            .touch-controls {
+                display: flex;
+            }
+            .hud {
+                font-size: 9px;
+            }
+        }
+
+        .dpad, .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .t-btn {
+            width: 55px;
+            height: 55px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+
+        .t-btn:active {
+            background: rgba(230, 156, 36, 0.7);
+        }
+
+        .back-link {
+            margin-top: 15px;
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 10px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+    <div class="hud">
+        <div>MARIO<span id="score">000000</span></div>
+        <div>MONETE<span id="coins">🪙 x00</span></div>
+        <div>LIVELLO<span id="level">01/50</span></div>
+        <div>TEMPO<span id="time">300</span></div>
+        <div>
+            <button class="btn" style="padding: 4px 8px; margin: 0; font-size: 9px;" onclick="togglePause()">⏸ PAUSA</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+    <div id="gameOverlay" class="overlay" style="display: none;">
+        <h1 id="overlayTitle">PAUSA</h1>
+        <p id="overlayMessage">Premi per riprendere il gioco</p>
+        <button id="overlayBtn" class="btn" onclick="resumeGame()">RIPRENDI</button>
+    </div>
+
+    <div class="touch-controls">
+        <div class="dpad">
+            <div class="t-btn" id="btnLeft">◀</div>
+            <div class="t-btn" id="btnRight">▶</div>
+        </div>
+        <div class="action-btns">
+            <div class="t-btn" id="btnJump" style="background: rgba(229,37,33,0.5);">▲</div>
+        </div>
+    </div>
+
+    <a href="/" class="back-link">⬅ Torna alla Dashboard di FoundmyIp</a>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// --- SISTEMA AUDIO WEB (EFFETTI RETRO SINTETIZZATI) ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const now = audioCtx.currentTime;
+
+    if (type === 'jump') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+    } else if (type === 'coin') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, now); // B5
+        osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+    } else if (type === 'stomp') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+    } else if (type === 'powerup') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+    }
+}
+
+// --- COSTANTI DI GIOCO ---
+const TILE_SIZE = 32;
+const GRAVITY = 0.45;
+const MAX_LEVELS = 50;
+
+let currentLevel = 1;
+let score = 0;
+let coins = 0;
+let levelTime = 300;
+let isPaused = false;
+let isGameOver = false;
+let cameraX = 0;
+let timerInterval = null;
+
+// --- INPUT HANDLER ---
+const keys = { left: false, right: false, jump: false };
+
+  
