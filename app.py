@@ -6,11 +6,11 @@ from datetime import datetime
 import requests
 import phonenumbers
 from phonenumbers import carrier, geocoder, number_type
-from flask import Flask, render_template_string, request, jsonify
+from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
 
-# --- LOGICA SCRIPT 1: IP LOOKUP & PORT SCAN ---
+# --- IP LOOKUP & PORT SCAN ---
 def ip_lookup(ip):
     try:
         url = f"http://ip-api.com/json/{ip}?fields=status,message,continent,country,regionName,city,zip,lat,lon,timezone,isp,org,as,reverse,mobile,proxy,hosting,query"
@@ -24,19 +24,19 @@ def ip_lookup(ip):
 
 def scan_ports(ip, ports):
     RISCHI = {
-        21: "FTP - credenziali in chiaro. Usa SFTP.",
-        22: "SSH - rischio bruteforce. Usa chiavi.",
-        23: "Telnet - RISCHIO ALTO, non criptato.",
-        25: "SMTP - rischio open relay spam.",
+        21: "FTP - credenziali in chiaro.",
+        22: "SSH - rischio bruteforce.",
+        23: "Telnet - RISCHIO ALTO.",
+        25: "SMTP - rischio open relay.",
         53: "DNS - rischio amplification DDoS.",
         80: "HTTP - info disclosure.",
         110: "POP3 - posta in chiaro.",
         143: "IMAP - posta in chiaro.",
-        443: "HTTPS - verifica certificato e TLS.",
-        3306: "MySQL - RISCHIO ALTO se esposto.",
-        3389: "RDP - RISCHIO ALTO. Usa VPN.",
+        443: "HTTPS - verifica certificato.",
+        3306: "MySQL - esposto su internet.",
+        3389: "RDP - bersaglio ransomware.",
         5900: "VNC - desktop remoto esposto.",
-        8080: "HTTP Alt - pannelli admin esposti."
+        8080: "HTTP Alt - pannelli admin."
     }
     risultati = []
     for p in ports:
@@ -50,14 +50,15 @@ def scan_ports(ip, ports):
             risultati.append({"porta": p, "stato": "chiusa/filtrata", "rischio": "ok"})
     return risultati
 
-# --- LOGICA SCRIPT 2: PHONE ANALYZER ---
+# --- PHONE ANALYZER ---
 MOBILE_PREFIX = {
     "330":"TIM","331":"TIM","333":"TIM","334":"TIM","335":"TIM","336":"TIM","337":"TIM","338":"TIM","339":"TIM","360":"TIM","361":"TIM","362":"TIM","363":"TIM","366":"TIM","368":"TIM",
     "340":"Vodafone","341":"Vodafone","342":"Vodafone","343":"Vodafone","345":"Vodafone","346":"Vodafone","347":"Vodafone","348":"Vodafone","349":"Vodafone",
     "320":"WindTre","321":"WindTre","322":"WindTre","323":"WindTre","324":"WindTre","325":"WindTre","326":"WindTre","327":"WindTre","328":"WindTre","329":"WindTre","380":"WindTre","381":"WindTre","383":"WindTre","388":"WindTre","389":"WindTre","391":"WindTre","392":"WindTre",
     "351":"Iliad","352":"Iliad","353":"Iliad","354":"Iliad","376":"Iliad","377":"Iliad",
-    "350":"MVNO","370":"PosteMobile/Fastweb","371":"PosteMobile","373":"Kena/Fastweb","375":"Ho./Very","379":"CoopVoce/Fastweb"
+    "350":"MVNO","370":"PosteMobile/Fastweb","371":"PosteMobile","373":"Kena/Fastweb","375":"ho. Mobile / Very","379":"ho. Mobile / Fastweb / CoopVoce"
 }
+
 FISSO_PREFIX = {
     "02":"Milano","06":"Roma","011":"Torino","010":"Genova","041":"Venezia","049":"Padova","051":"Bologna","055":"Firenze","070":"Cagliari","079":"Sassari","0789":"Olbia","081":"Napoli","080":"Bari","091":"Palermo"
 }
@@ -76,7 +77,7 @@ def analyze_phone(raw):
     valid = phonenumbers.is_valid_number(parsed)
     possible = phonenumbers.is_possible_number(parsed)
     t = number_type(parsed)
-    t_map = {0:"FISSO/MOBILE",1:"FISSO",2:"MOBILE",3:"FISSO/MOBILE",4:"TOLL FREE",5:"PREMIUM"}
+    t_map = {0:"FISSO/MOBILE", 1:"FISSO", 2:"MOBILE", 3:"FISSO/MOBILE", 4:"TOLL FREE", 5:"PREMIUM"}
     tipo = t_map.get(t, str(t))
 
     e164 = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
@@ -92,97 +93,155 @@ def analyze_phone(raw):
     num_wa = e164.replace('+','')
 
     return {
-        "input": raw,
-        "normalized": clean,
-        "e164": e164,
-        "international": intl,
-        "national": nat,
-        "valid": valid,
-        "possible": possible,
-        "type": tipo,
-        "geo": geo,
-        "carrier_lib": carr_lib if carr_lib else "N/D",
-        "operator_origin_db": op_db,
-        "links": {
+        "input_originale": raw,
+        "numero_normalizzato": clean,
+        "formato_e164": e164,
+        "formato_nazionale": nat,
+        "valido": valid,
+        "tipo_linea": tipo,
+        "posizione_geografica": geo if geo else "Italia",
+        "operatore_originario_blocco": op_db,
+        "nota_portabilita": "Se l'utente ha fatto MNP (portabilità), l'operatore attuale (es. ho. Mobile) può variare rispetto a quello nativo.",
+        "collegamenti": {
             "whatsapp": f"https://wa.me/{num_wa}",
             "telegram": f"https://t.me/+{num_wa}"
         }
     }
 
-# --- INTERFACCIA WEB SEMPLICE ---
+# --- TEMPLATE HTML PULITO E SENZA FEEDBACK ---
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Tool OSINT Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT Dashboard Pro</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #e0e0e0; padding: 20px; max-width: 800px; margin: auto; }
-        h1 { color: #bb86fc; }
-        .box { background: #1e1e1e; padding: 15px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #333; }
-        input, button { padding: 10px; margin-top: 5px; width: 100%; box-sizing: border-box; background: #2d2d2d; color: white; border: 1px solid #444; border-radius: 4px; }
-        button { background: #bb86fc; color: black; font-weight: bold; cursor: pointer; }
-        button:hover { background: #9965f4; }
-        pre { background: #000; padding: 10px; border-radius: 4px; overflow-x: auto; color: #03dac6; }
-    </style>
-</head>
-<body>
-    <h1>Tool OSINT Web Dashboard</h1>
-    
-    <div class="box">
-        <h3>1. IP Lookup & Port Scan</h3>
-        <form method="POST" action="/ip">
-            <input type="text" name="ip" placeholder="Inserisci IP (es. 8.8.8.8)" required>
-            <button type="submit">Esegui Scansione IP</button>
-        </form>
-    </div>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --input-bg: #090d16;
+            --border-color: #334155;
+        }
 
-    <div class="box">
-        <h3>2. Phone Number Analyzer</h3>
-        <form method="POST" action="/phone">
-            <input type="text" name="phone" placeholder="Inserisci Numero (es. +393331234567)" required>
-            <button type="submit">Analizza Numero</button>
-        </form>
-    </div>
+        body.theme-matrix {
+            --bg-color: #022c22;
+            --card-bg: #064e3b;
+            --accent-color: #10b981;
+            --accent-hover: #059669;
+        }
 
-    {% if result %}
-    <div class="box">
-        <h3>Risultato:</h3>
-        <pre>{{ result }}</pre>
-    </div>
-    {% endif %}
-</body>
-</html>
-"""
+        body.theme-ocean {
+            --bg-color: #082f49;
+            --card-bg: #0369a1;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+        }
 
-@app.route('/')
-def home():
-    return render_template_string(HTML_TEMPLATE, result=None)
+        body.theme-light {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --input-bg: #f8fafc;
+            --border-color: #cbd5e1;
+        }
 
-@app.route('/ip', methods=['POST'])
-def handle_ip():
-    ip = request.form.get('ip', '').strip()
-    info = ip_lookup(ip)
-    porte_comuni = [21,22,23,25,53,80,110,143,443,3306,3389,5900,8080]
-    scan = scan_ports(ip, porte_comuni)
-    output = {
-        "ip": ip,
-        "timestamp": datetime.now().isoformat(),
-        "lookup": info,
-        "porte": scan
-    }
-    return render_template_string(HTML_TEMPLATE, result=json.dumps(output, indent=2, ensure_ascii=False))
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
 
-@app.route('/phone', methods=['POST'])
-def handle_phone():
-    phone = request.form.get('phone', '').strip()
-    try:
-        res = analyze_phone(phone)
-        output = json.dumps(res, indent=4, ensure_ascii=False)
-    except Exception as e:
-        output = json.dumps({"errore": str(e)}, indent=4)
-    return render_template_string(HTML_TEMPLATE, result=output)
+        .container {
+            width: 100%;
+            max-width: 650px;
+        }
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            color: var(--accent-color);
+        }
+
+        .theme-selector select {
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0 20px 0;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
