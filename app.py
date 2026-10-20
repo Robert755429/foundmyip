@@ -12,7 +12,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 app = Flask(__name__)
 
 app.secret_key = os.environ.get("SECRET_KEY", "chiave_segreta_di_default_cambiala_su_render")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Nicola11.")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
 DB_NAME = "ip_history.db"
 
