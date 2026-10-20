@@ -34,7 +34,7 @@ def log_ip_access(ip, user_agent):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO ip_logs (ip, user_agent) VALUES (?, ?)", (ip, user_agent))
-    cutoff_date = datetime.now() - timedelta(days=10)
+    cutoff_date = datetime.now() - timedelta(days=1)
     cursor.execute("DELETE FROM ip_logs WHERE timestamp < ?", (cutoff_date,))
     conn.commit()
     conn.close()
@@ -42,7 +42,7 @@ def log_ip_access(ip, user_agent):
 def get_ip_history():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cutoff_date = datetime.now() - timedelta(days=10)
+    cutoff_date = datetime.now() - timedelta(days=1)
     cursor.execute("DELETE FROM ip_logs WHERE timestamp < ?", (cutoff_date,))
     conn.commit()
     cursor.execute("SELECT ip, user_agent, timestamp FROM ip_logs ORDER BY timestamp DESC")
