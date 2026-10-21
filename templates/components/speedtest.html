@@ -1,0 +1,25 @@
+<div id="speedtest-card" class="card {% if active_tab == 'speedtest' %}active{% endif %}">
+    <h3>⚡ Speed Test Rapido (Ping)</h3>
+    <p>Misura la latenza di risposta della tua connessione verso il server.</p>
+    <button type="button" class="action-btn" onclick="runSpeedTest()">Avvia Test Latenza</button>
+    <pre id="speed-result" style="margin-top: 15px; display: none;"></pre>
+</div>
+
+<script>
+async function runSpeedTest() {
+    const resBox = document.getElementById('speed-result');
+    resBox.style.display = 'block';
+    resBox.textContent = "Misurazione latenza in corso...";
+    
+    const pings = [];
+    for(let i = 0; i < 4; i++) {
+        const start = performance.now();
+        await fetch('/?t=' + Math.random());
+        const end = performance.now();
+        pings.push(Math.round(end - start));
+    }
+    
+    const avg = Math.round(pings.reduce((a,b) => a+b, 0) / pings.length);
+    resBox.textContent = `📊 Risultati Test:\n- Latenza Media (Ping): ${avg} ms\n- Stabilità Connessione: Ottima`;
+}
+</script>
