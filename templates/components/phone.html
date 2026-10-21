@@ -1,0 +1,8 @@
+<div id="phone-card" class="card {% if active_tab == 'phone' %}active{% endif %}">
+    <h3>Analizzatore Numeri</h3>
+    <form method="POST" action="/phone">
+        <label>Inserisci Numero (es. +39XXXXXXXXXX)</label>
+        <input type="text" name="phone" placeholder="+39..." value="{{ phone_val or '' }}" required>
+        <button type="submit" class="action-btn">Avvia Analisi Telefono</button>
+    </form>
+</div>
