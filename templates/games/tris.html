@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tris (Tic-Tac-Toe) - FoundmyIp</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .game-card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            text-align: center;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-top: 0;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            background: #090d16;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #8b5cf6;
+            color: #ffffff;
+            border-color: #8b5cf6;
+        }
+
+        .status {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            min-height: 25px;
+            color: #f59e0b;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background: #090d16;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .cell:hover {
+            border-color: #38bdf8;
+        }
+
+        .cell.x {
+            color: #38bdf8;
+        }
+
+        .cell.o {
+            color: #ef4444;
+        }
+
+        .restart-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .restart-btn:hover {
+            background: #0284c7;
+            color: #ffffff;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-card">
+        <h1>❌ Tris (Tic-Tac-Toe) ⭕</h1>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" id="btnAi" onclick="setMode('ai')">🤖 vs AI</button>
+            <button class="mode-btn" id="btnLocal" onclick="setMode('local')">👥 1vs1 Locale</button>
+        </div>
+
+        <div class="status" id="statusText">Turno del Giocatore (X)</div>
+
+        <div class="board" id="board">
+            <div class="cell" onclick="makeMove(0)"></div>
+            <div class="cell" onclick="makeMove(1)"></div>
+            <div class="cell" onclick="makeMove(2)"></div>
+            <div class="cell" onclick="makeMove(3)"></div>
+            <div class="cell" onclick="makeMove(4)"></div>
+            <div class="cell" onclick="makeMove(5)"></div>
+            <div class="cell" onclick="makeMove(6)"></div>
+            <div class="cell" onclick="makeMove(7)"></div>
+            <div class="cell" onclick="makeMove(8)"></div>
+        </div>
+
+        <button class="restart-btn" onclick="resetGame()">🔄 Nuova Partita</button>
+        <a href="/" class="back-link">⬅ Torna alla Dashboard</a>
+    </div>
+
+<script>
+let boardState = ["", "", "", "", "", "", "", "", ""];
+let currentPlayer = "X";
+let isGameActive = true;
+let gameMode = "ai"; // 'ai' oppure 'local'
+
+const WINNING_COMBOS = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], // Righe
+    [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colonne
+    [0, 4, 8], [2, 4, 6]             // Diagonali
+];
+
+function setMode(mode) {
+    gameMode = mode;
+    document.getElementById('btnAi').classList.toggle('active', mode === 'ai');
+    document.getElementById('btnLocal').classList.toggle('active', mode === 'local');
+    resetGame();
+}
+
+function updateStatus(message) {
+    document.getElementById('statusText').textContent = message;
+}
+
+function makeMove(index) {
+    if (boardState[index] !== "" || !isGameActive) return;
+
+    // Mossa Giocatore Umano (X)
+    executeMove(index, currentPlayer);
+
+    if (checkWinner(currentPlayer)) {
+        updateStatus(`🎉 Ha vinto il Giocatore (${currentPlayer})!`);
+        isGameActive = false;
+        return;
+    }
+
+    if (boardState.every(cell => cell !== "")) {
+        updateStatus("🤝 Pareggio!");
+        isGameActive = false;
+        return;
+    }
+
+    // Cambio Turno
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+    if (gameMode === "local") {
+        updateStatus(`Turno del Giocatore (${currentPlayer})`);
+    } else if (gameMode === "ai" && currentPlayer === "O" && isGameActive) {
+        updateStatus("🤖 L'AI sta pensando...");
+        setTimeout(aiMove, 500);
+    }
+}
+
+function executeMove(index, player) {
+    boardState[index] = player;
+    const cells = document.querySelectorAll('.cell');
+    cells[index].textContent = player;
+    cells[index].classList.add(player.toLowerCase());
+}
+
+function aiMove() {
+    if (!isGameActive) return;
+
+    // 1. Prova a vincere se possibile
+    let bestMove = findBestIndex("O");
+
+    // 2. Blocca il giocatore se sta per vincere
+    if (bestMove === null) {
+        bestMove = findBestIndex("X");
+    }
+
+    // 3. Prendi il centro se disponibile
+    if (bestMove === null && boardState[4] === "") {
+        bestMove = 4;
+    }
+
+    // 4. Mossa casuale tra le caselle libere rimanenti
+    if (bestMove === null) {
+        const emptyIndices = boardState.map((val, idx) => val === "" ? idx : null).filter(val => val !== null);
+        if (emptyIndices.length > 0) {
+            bestMove = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+        }
+    }
+
+    if (bestMove !== null) {
+        executeMove(bestMove, "O");
+
+        if (checkWinner("O")) {
+            updateStatus("🤖 Ha vinto l'AI!");
+            isGameActive = false;
+            return;
+        }
+
+        if (boardState.every(cell => cell !== "")) {
+            updateStatus("🤝 Pareggio!");
+            isGameActive = false;
+            return;
+        }
+
+        currentPlayer = "X";
+        updateStatus("Turno del Giocatore (X)");
+    }
+}
+
+function findBestIndex(player) {
+    for (let combo of WINNING_COMBOS) {
+        const [a, b, c] = combo;
+        const vals = [boardState[a], boardState[b], boardState[c]];
+        if (vals.filter(v => v === player).length === 2 && vals.includes("")) {
+            return combo[vals.indexOf("")];
+        }
+    }
+    return null;
+}
+
+function checkWinner(player) {
+    return WINNING_COMBOS.some(combo => {
+        return combo.every(index => boardState[index] === player);
+    });
+}
+
+function resetGame() {
+    boardState = ["", "", "", "", "", "", "", "", ""];
+    currentPlayer = "X";
+    isGameActive = true;
+    updateStatus("Turno del Giocatore (X)");
+
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        cell.textContent = "";
+        cell.classList.remove('x', 'o');
+    });
+}
+</script>
+</body>
+</html>
