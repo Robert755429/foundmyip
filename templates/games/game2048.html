@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 - FoundmyIp</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(4, 70px); gap: 10px; background: #1e293b; padding: 10px; border-radius: 10px; }
+        .cell { width: 70px; height: 70px; background: #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: #f8fafc; }
+        .back-btn { margin-top: 20px; color: #38bdf8; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🧩 2048 Puzzle</h1>
+    <div class="grid" id="grid2048"></div>
+    <a href="/" class="back-btn">⬅ Torna alla Dashboard</a>
+
+<script>
+let board = Array(16).fill(0);
+function render() {
+    const g = document.getElementById('grid2048');
+    g.innerHTML = '';
+    board.forEach(v => {
+        const c = document.createElement('div');
+        c.className = 'cell';
+        c.textContent = v > 0 ? v : '';
+        if(v > 0) c.style.background = '#8b5cf6';
+        g.appendChild(c);
+    });
+}
+function addTile() {
+    let empty = board.map((v, i) => v === 0 ? i : null).filter(v => v !== null);
+    if(empty.length) board[empty[Math.floor(Math.random()*empty.length)]] = 2;
+}
+addTile(); addTile(); render();
+</script>
+</body>
+</html>
