@@ -29,7 +29,7 @@
         .top-scroll-nav { display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: var(--accent-color) var(--card-bg); -webkit-overflow-scrolling: touch; }
         .top-scroll-nav::-webkit-scrollbar { height: 6px; }
         .top-scroll-nav::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
-        .top-scroll-nav .tab-btn { flex: 0 0 auto; min-width: 120px; }
+        .top-scroll-nav .tab-btn { flex: 0 0 auto; min-width: 110px; }
         .tab-btn { padding: 12px; text-align: center; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); font-weight: bold; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-decoration: none; font-size: 0.85rem; }
         .tab-btn.active { background: var(--accent-color); color: #ffffff; border-color: var(--accent-color); }
 
@@ -116,22 +116,22 @@
     </div>
 
     <script>
-        async function getLocalIpAndGPS() {
+        async function requestGPSPermission() {
             const resBox = document.getElementById('myip-result');
             resBox.style.display = 'block';
-            resBox.textContent = "Rilevamento in corso...";
+            resBox.textContent = "⌛ Richiesta autorizzazione GPS in corso...";
 
             try {
                 const ipResponse = await fetch('https://api.ipify.org?format=json');
                 const ipData = await ipResponse.json();
                 const clientIp = ipData.ip;
 
-                if (navigator.geolocation) {
+                if ("geolocation" in navigator) {
                     navigator.geolocation.getCurrentPosition(
                         async (position) => {
                             const lat = position.coords.latitude;
                             const lon = position.coords.longitude;
-                            const acc = position.coords.accuracy;
+                            const acc = Math.round(position.coords.accuracy);
 
                             let localita = "Sconosciuta";
                             try {
@@ -140,82 +140,11 @@
                                 if (geoData && geoData.address) {
                                     const town = geoData.address.town || geoData.address.city || geoData.address.village || "";
                                     const county = geoData.address.county || geoData.address.state || "";
-                                    localita = `${town} (${county}), Italia`.trim();
+                                    localita = `${town} (${county})`.trim();
                                 }
-                            } catch (e) { localita = "Posizione GPS valida"; }
+                            } catch (e) { 
+                                localita = "Posizione GPS Rilevata"; 
+                            }
 
                             const output = {
-                                "mio_ip": clientIp,
-                                "timestamp": new Date().toISOString(),
-                                "localita_reale": localita,
-                                "latitudine": lat,
-                                "longitudine": lon,
-                                "precisione_metri": acc,
-                                "link_google_maps": `https://www.google.com/maps?q=${lat},${lon}`
-                            };
-                            resBox.textContent = JSON.stringify(output, null, 2);
-                        },
-                        (error) => { resBox.textContent = JSON.stringify({ "mio_ip": clientIp, "errore_gps": error.message }, null, 2); },
-                        { enableHighAccuracy: true }
-                    );
-                } else { resBox.textContent = "IP: " + clientIp + "\nGPS non supportato."; }
-            } catch (err) { resBox.textContent = "Errore: " + err.message; }
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.top-scroll-nav .tab-btn').forEach(b => b.classList.remove('active'));
-
-            const card = document.getElementById(tab + '-card');
-            if(card) card.classList.add('active');
-
-            const btns = document.querySelectorAll('.top-scroll-nav .tab-btn');
-            const tabsList = ['phone', 'ip', 'myip', 'password', 'qrcode', 'speedtest', 'games', 'admin'];
-            const idx = tabsList.indexOf(tab);
-            if(idx !== -1 && btns[idx]) btns[idx].classList.add('active');
-        }
-
-        function changeTheme(theme) {
-            document.body.className = '';
-            if(theme && theme !== 'cyber') document.body.classList.add('theme-' + theme);
-            localStorage.setItem('selected_theme', theme);
-        }
-
-        function acceptCookies() {
-            localStorage.setItem('cookies_accepted', 'true');
-            document.getElementById('cookie-overlay').style.display = 'none';
-        }
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        // Easter Egg: Terminale Hacker sul logo (5 click)
-        let logoClicks = 0;
-        document.getElementById('mainTitle').addEventListener('click', () => {
-            logoClicks++;
-            if(logoClicks >= 5) {
-                alert("💻 Terminale Hacker Sbloccato!");
-                const cmd = prompt("Digita un comando (es. 'matrix', 'light', 'ocean', 'cyber'):");
-                if(cmd === 'matrix' || cmd === 'light' || cmd === 'ocean' || cmd === 'cyber') {
-                    changeTheme(cmd);
-                    const sel = document.getElementById('themeSelect');
-                    if(sel) sel.value = cmd;
-                }
-                logoClicks = 0;
-            }
-        });
-
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('selected_theme');
-            if(savedTheme) {
-                const selectEl = document.getElementById('themeSelect');
-                if(selectEl) selectEl.value = savedTheme;
-                changeTheme(savedTheme);
-            }
-            if(!localStorage.getItem('cookies_accepted')) {
-                document.getElementById('cookie-overlay').style.display = 'flex';
-            }
-        }
-    </script>
-</body>
-</html>
+                                "mio_ip": client
