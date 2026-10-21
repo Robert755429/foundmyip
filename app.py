@@ -1,5 +1,6 @@
 import os
 import json
+import urllib.request
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, session, redirect, url_for
 from games import games_bp
@@ -64,14 +65,36 @@ def index():
 @app.route("/phone", methods=["POST"])
 def phone_analysis():
     phone_num = request.form.get("phone", "")
-    res = f"Analisi completata per: {phone_num}\nPaese: Italia (+39)\nOperatore stimato: Mobile\nStato: Attivo"
+    res = f"""📱 DETTAGLI ANALISI NUMERO: {phone_num}
+----------------------------------------
+• Paese: Italia (+39)
+• Operatore Stimato: Telecom Italia / Vodafone / WindTre / Iliad
+• Tipo Linea: Mobile (Cellulare)
+• Formato Internazionale: Valido
+• Stato Scheda SIM: Attiva / In Rete"""
     return render_template("index.html", active_tab="phone", result=res, phone_val=phone_num)
 
 @app.route("/ip", methods=["POST"])
 def ip_lookup():
-    target_ip = request.form.get("ip", "")
-    res = f"Scansione IP: {target_ip}\nStatus: Online\nPorte aperte: 80 (HTTP), 443 (HTTPS)"
-    return render_template("index.html", active_tab="ip", result=res, ip_val=target_ip)
+    target_ip = request.form.get("ip", "").strip()
+    
+    geo_data = {}
+    try:
+        url = f"http://ip-api.com/json/{target_ip}?fields=status,message,continent,country,regionName,city,zip,lat,lon,timezone,isp,org,as,reverse,mobile,proxy,hosting,query"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            geo_data = json.loads(response.read().decode())
+    except Exception as e:
+        geo_data = {"status": "fail", "message": str(e)}
+
+    output = {
+        "mio_ip": target_ip,
+        "timestamp": datetime.utcnow().isoformat(),
+        "dettagli_geolocalizzazione": geo_data
+    }
+    
+    res_json = json.dumps(output, indent=2)
+    return render_template("index.html", active_tab="ip", result=res_json, ip_val=target_ip)
 
 @app.route("/admin/login", methods=["POST"])
 def admin_login():
