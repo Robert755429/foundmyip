@@ -10,10 +10,6 @@ def platformer():
 def lucchetto():
     return render_template('games/lucchetto.html')
 
-@games_bp.route('/blockblast')
-def blockblast():
-    return render_template('games/blockblast.html')
-
 @games_bp.route('/guesstheflag')
 def guesstheflag():
     return render_template('games/guesstheflag.html')
