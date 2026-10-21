@@ -1,6 +1,8 @@
 <div id="myip-card" class="card {% if active_tab == 'myip' %}active{% endif %}">
-    <h3>Localizza il tuo Indirizzo IP</h3>
-    <p>Ottieni il tuo IP e la posizione esatta unita al GPS del dispositivo.</p>
-    <button type="button" class="action-btn" onclick="getLocalIpAndGPS()">📍 Localizza il Mio IP Adesso</button>
+    <h3>📍 Localizza il tuo Indirizzo IP & GPS</h3>
+    <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 15px;">
+        Rileva istantaneamente il tuo IP pubblico, la posizione approssimativa dalla rete e le coordinate GPS ad alta precisione del dispositivo.
+    </p>
+    <button type="button" class="action-btn" onclick="requestGPSPermission()">📍 Localizza il Mio IP Adesso</button>
     <pre id="myip-result" style="margin-top: 15px; display: none;"></pre>
 </div>
