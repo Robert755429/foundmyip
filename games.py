@@ -17,3 +17,11 @@ def blockblast():
 @games_bp.route('/guesstheflag')
 def guesstheflag():
     return render_template('games/guesstheflag.html')
+    
+@games_bp.route('/2048')
+def game_2048():
+    return render_template('games/game2048.html')
+
+@games_bp.route('/tris')
+def tris():
+    return render_template('games/tris.html')
