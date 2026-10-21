@@ -5,13 +5,19 @@
     <button class="tab-btn {% if active_tab == 'phone' %}active{% endif %}" onclick="switchTab('phone')">📱 Telefono</button>
     <button class="tab-btn {% if active_tab == 'ip' %}active{% endif %}" onclick="switchTab('ip')">🌐 IP Lookup</button>
     <button class="tab-btn {% if active_tab == 'myip' %}active{% endif %}" onclick="switchTab('myip')">📍 Il Mio IP</button>
+    <button class="tab-btn {% if active_tab == 'password' %}active{% endif %}" onclick="switchTab('password')">🔐 Password</button>
+    <button class="tab-btn {% if active_tab == 'qrcode' %}active{% endif %}" onclick="switchTab('qrcode')">📷 QR Code</button>
+    <button class="tab-btn {% if active_tab == 'speedtest' %}active{% endif %}" onclick="switchTab('speedtest')">⚡ Speed Test</button>
     <button class="tab-btn {% if active_tab == 'games' %}active{% endif %}" onclick="switchTab('games')">🕹️ Minigiochi</button>
-    <button class="tab-btn {% if active_tab == 'admin' %}active{% endif %}" onclick="switchTab('admin')">🔐 Area Admin</button>
+    <button class="tab-btn {% if active_tab == 'admin' %}active{% endif %}" onclick="switchTab('admin')">🔐 Admin</button>
 </div>
 
 {% include 'components/phone.html' %}
 {% include 'components/ip.html' %}
 {% include 'components/myip.html' %}
+{% include 'components/password.html' %}
+{% include 'components/qrcode.html' %}
+{% include 'components/speedtest.html' %}
 {% include 'components/games_list.html' %}
 {% include 'components/admin.html' %}
 
