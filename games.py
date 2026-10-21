@@ -8,7 +8,7 @@ def platformer():
 
 @games_bp.route('/lucchetto')
 def lucchetto():
-    return render_template('games/lock.html')
+    return render_template('games/lucchetto.html')
 
 @games_bp.route('/blockblast')
 def blockblast():
