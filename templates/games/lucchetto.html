@@ -22,7 +22,6 @@
             align-items: center; 
             justify-content: center; 
             min-height: 100vh; 
-            cursor: pointer;
             touch-action: manipulation;
         }
 
@@ -35,7 +34,6 @@
             width: 90%; 
             max-width: 400px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
-            pointer-events: none; /* Disattiva gli eventi interni per trasmettere il tap al body */
         }
 
         h1 { color: #8b5cf6; margin-top: 0; font-size: 1.5rem; }
@@ -45,6 +43,7 @@
             width: 200px; 
             height: 200px; 
             margin: 20px auto; 
+            cursor: pointer;
         }
 
         .circle { 
@@ -57,22 +56,25 @@
 
         .target { 
             position: absolute; 
-            width: 20px; 
-            height: 20px; 
+            width: 24px; 
+            height: 24px; 
             background: #10b981; 
             border-radius: 50%; 
             transform: translate(-50%, -50%); 
+            box-shadow: 0 0 10px #10b981;
         }
 
+        /* Lancetta più cicciottella e con estremità arrotondate */
         .pointer { 
             position: absolute; 
-            width: 6px; 
+            width: 12px; 
             height: 90px; 
             background: #ef4444; 
             top: 10px; 
-            left: 97px; 
+            left: 94px; 
             transform-origin: bottom center; 
-            border-radius: 3px; 
+            border-radius: 6px; 
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
         }
 
         .score-box { 
@@ -82,50 +84,49 @@
             color: #38bdf8; 
         }
 
-        .tap-hint {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            font-weight: 600;
+        .btn-tap { 
+            background: #8b5cf6; 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: background 0.2s;
         }
+
+        .btn-tap:active { background: #7c3aed; }
 
         .back-link { 
             display: inline-block; 
-            margin-top: 25px; 
-            color: #38bdf8; 
+            margin-top: 20px; 
+            color: #94a3b8; 
             text-decoration: none; 
-            font-size: 0.95rem; 
-            font-weight: bold;
-            pointer-events: auto; /* Permette il click esclusivo sul pulsante di ritorno */
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            border: 1px solid #334155;
-            z-index: 100;
+            font-size: 0.9rem; 
+            font-weight: 600;
         }
 
-        .back-link:hover {
-            text-decoration: underline;
-            background: rgba(255, 255, 255, 0.1);
-        }
+        .back-link:hover { color: #38bdf8; text-decoration: underline; }
     </style>
 </head>
-<body id="gameArea">
+<body>
 
     <div class="game-card">
         <h1>🔓 Sblocca il Lucchetto</h1>
         <div class="score-box">LIVELLO: <span id="level">1</span></div>
-        <div class="lock-container">
+        
+        <div class="lock-container" onclick="handleTap()">
             <div class="circle">
                 <div class="target" id="target"></div>
                 <div class="pointer" id="pointer"></div>
             </div>
         </div>
-        <div class="tap-hint">TOCCA IN QUALSIASI PUNTO PER SBLOCCARE!</div>
-    </div>
 
-    <!-- Pulsante per tornare indietro (protetto dai click del gioco) -->
-    <a href="/" class="back-link" onclick="event.stopPropagation();">⬅ Torna alla Dashboard</a>
+        <button class="btn-tap" onclick="handleTap()">SBLOCCA!</button>
+        <a href="/" class="back-link">⬅ Torna alla Dashboard</a>
+    </div>
 
 <script>
 let level = 1;
@@ -155,28 +156,23 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-function handleTap(e) {
-    // Se il click avviene sul link di ritorno, non eseguire la logica del gioco
-    if (e.target.closest('.back-link')) return;
-
+function handleTap() {
     const diff = Math.abs(angle - targetAngle);
-    if (diff <= 15 || diff >= 345) {
+    // Tolleranza leggermente più generosa per renderlo fluido e giocabile
+    if (diff <= 20 || diff >= 340) {
         level++;
-        speed += 0.5;
+        speed += 0.4;
         direction *= -1;
         document.getElementById('level').textContent = level;
         updateTarget();
     } else {
-        alert('❌ Sbagliato! Ricominci dal livello 1');
+        // Niente alert fastidiosi che bloccano lo schermo: reset pulito e immediato!
         level = 1;
         speed = 2;
         document.getElementById('level').textContent = level;
         updateTarget();
     }
 }
-
-// Ascolta i tap o click su tutta la schermata
-document.body.addEventListener('pointerdown', handleTap);
 
 updateTarget();
 gameLoop();
