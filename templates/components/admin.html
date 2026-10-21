@@ -1,0 +1,19 @@
+<div id="admin-card" class="card {% if active_tab == 'admin' %}active{% endif %}">
+    {% if session.get('admin_logged_in') %}
+        <h3>🔐 Cronologia IP (Area Riservata Creator)</h3>
+        <p style="font-size: 0.85rem; color: #a7f3d0;">* Gli IP vengono memorizzati e puliti automaticamente dopo 10 giorni.</p>
+        <a href="/admin/logout" style="color: #fca5a5; display: inline-block; margin-bottom: 15px; text-decoration: none;">🚪 Effettua Logout</a>
+        {% if history %}
+            <pre>{{ history }}</pre>
+        {% else %}
+            <p>Nessun IP registrato negli ultimi 10 giorni.</p>
+        {% endif %}
+    {% else %}
+        <h3>🔐 Accesso Riservato Creatore</h3>
+        <form method="POST" action="/admin/login">
+            <label>Password Amministratore</label>
+            <input type="password" name="password" placeholder="Inserisci la password..." required>
+            <button type="submit" class="action-btn">Accedi alla Cronologia IP</button>
+        </form>
+    {% endif %}
+</div>
