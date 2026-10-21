@@ -8,12 +8,16 @@ def platformer():
 
 @games_bp.route('/lucchetto')
 def lucchetto():
-    return render_template('games/lucchetto.html')
+    return render_template('games/lock.html')
 
 @games_bp.route('/guesstheflag')
 def guesstheflag():
     return render_template('games/guesstheflag.html')
-    
+
+@games_bp.route('/blockblast')
+def blockblast():
+    return render_template('games/blockblast.html')
+
 @games_bp.route('/2048')
 def game_2048():
     return render_template('games/game2048.html')
