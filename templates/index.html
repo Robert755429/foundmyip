@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 {% block content %}
@@ -9,6 +10,7 @@
     <button class="tab-btn {% if active_tab == 'qrcode' %}active{% endif %}" onclick="switchTab('qrcode')">📷 QR Code</button>
     <button class="tab-btn {% if active_tab == 'speedtest' %}active{% endif %}" onclick="switchTab('speedtest')">⚡ Speed Test</button>
     <button class="tab-btn {% if active_tab == 'games' %}active{% endif %}" onclick="switchTab('games')">🕹️ Minigiochi</button>
+    <button class="tab-btn {% if active_tab == 'submit' %}active{% endif %}" onclick="switchTab('submit')">💡 Idee & Feedback</button>
     <button class="tab-btn {% if active_tab == 'admin' %}active{% endif %}" onclick="switchTab('admin')">🔐 Admin</button>
 </div>
 
@@ -19,6 +21,21 @@
 {% include 'components/qrcode.html' %}
 {% include 'components/speedtest.html' %}
 {% include 'components/games_list.html' %}
+
+<div id="submit-card" class="card {% if active_tab == 'submit' %}active{% endif %}">
+    <h3>💡 Invia una Nuova Idea o un Feedback</h3>
+    <form method="POST" action="/submit_idea">
+        <label>Seleziona Tipo</label>
+        <select name="tipo">
+            <option value="idea">💡 Idea per il sito</option>
+            <option value="feedback">💬 Feedback / Parere</option>
+        </select>
+        <label>Il tuo messaggio:</label>
+        <textarea name="messaggio" rows="4" placeholder="Scrivi qui..." style="width: 100%; padding: 12px; margin: 8px 0 16px 0; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px;" required></textarea>
+        <button type="submit" class="action-btn">Invia Messaggio</button>
+    </form>
+</div>
+
 {% include 'components/admin.html' %}
 
 {% if result %}
