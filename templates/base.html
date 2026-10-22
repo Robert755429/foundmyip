@@ -23,7 +23,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.3s ease; }
         .container { width: 100%; max-width: 700px; flex: 1; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 1px solid var(--border-color); }
-        h1 { font-size: 1.4rem; margin: 0; color: var(--accent-color); cursor: pointer; }
+        h1 { font-size: 1.4rem; margin: 0; color: var(--accent-color); }
         .theme-selector select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; cursor: pointer; }
 
         .top-scroll-nav { display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: var(--accent-color) var(--card-bg); -webkit-overflow-scrolling: touch; }
@@ -45,7 +45,6 @@
         .games-vertical-container::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
         .game-link { display: flex; align-items: center; justify-content: center; padding: 15px; border-radius: 10px; color: #ffffff; font-weight: bold; text-decoration: none; font-size: 0.95rem; transition: transform 0.15s, opacity 0.15s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .game-link:hover { transform: translateY(-2px); opacity: 0.95; }
-        .coming-soon-box { background: rgba(255, 255, 255, 0.03); border: 2px dashed var(--border-color); padding: 16px; text-align: center; border-radius: 10px; color: #94a3b8; font-weight: bold; font-size: 0.9rem; letter-spacing: 0.5px; }
 
         pre { background: #020617; color: #38bdf8; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.9rem; border: 1px solid var(--border-color); }
         .alert-error { background: #7f1d1d; color: #fca5a5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #991b1b; }
@@ -63,7 +62,7 @@
 <body class="{{ theme }}">
     <div class="container">
         <header>
-            <h1 id="mainTitle">🌐 FoundmyIp</h1>
+            <h1>🌐 FoundmyIp</h1>
             <div class="theme-selector">
                 <select id="themeSelect" onchange="changeTheme(this.value)">
                     <option value="cyber">Cyber Viola</option>
@@ -194,7 +193,7 @@
             if(card) card.classList.add('active');
 
             const btns = document.querySelectorAll('.top-scroll-nav .tab-btn');
-            const tabsList = ['phone', 'ip', 'myip', 'password', 'qrcode', 'speedtest', 'games', 'admin'];
+            const tabsList = ['phone', 'ip', 'myip', 'password', 'qrcode', 'speedtest', 'games', 'submit', 'updates', 'admin'];
             const idx = tabsList.indexOf(tab);
             if(idx !== -1 && btns[idx]) btns[idx].classList.add('active');
         }
@@ -212,21 +211,6 @@
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        let logoClicks = 0;
-        document.getElementById('mainTitle').addEventListener('click', () => {
-            logoClicks++;
-            if(logoClicks >= 5) {
-                alert("💻 Terminale Hacker Sbloccato!");
-                const cmd = prompt("Digita un comando (es. 'matrix', 'light', 'ocean', 'cyber'):");
-                if(cmd === 'matrix' || cmd === 'light' || cmd === 'ocean' || cmd === 'cyber') {
-                    changeTheme(cmd);
-                    const sel = document.getElementById('themeSelect');
-                    if(sel) sel.value = cmd;
-                }
-                logoClicks = 0;
-            }
-        });
 
         window.onload = function() {
             const savedTheme = localStorage.getItem('selected_theme');
