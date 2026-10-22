@@ -1,19 +1,46 @@
 <div id="admin-card" class="card {% if active_tab == 'admin' %}active{% endif %}">
+    <h3>🔐 Area Amministratore Riservata</h3>
+    
     {% if session.get('admin_logged_in') %}
-        <h3>🔐 Cronologia IP (Area Riservata Creator)</h3>
-        <p style="font-size: 0.85rem; color: #a7f3d0;">* Gli IP vengono memorizzati e puliti automaticamente dopo 10 giorni.</p>
-        <a href="/admin/logout" style="color: #fca5a5; display: inline-block; margin-bottom: 15px; text-decoration: none;">🚪 Effettua Logout</a>
-        {% if history %}
-            <pre>{{ history }}</pre>
-        {% else %}
-            <p>Nessun IP registrato negli ultimi 10 giorni.</p>
-        {% endif %}
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+            <p style="color: #10b981; font-weight: bold; margin: 0 0 10px 0;">✅ Accesso Admin Effettuato!</p>
+            <a href="/admin/logout" class="action-btn" style="background: #ef4444; padding: 8px; font-size: 0.9rem;">Disconnetti (Logout)</a>
+        </div>
+
+        <h4 style="color: var(--accent-color); margin-top: 20px;">Pannello di Controllo Esclusivo:</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <button type="button" class="action-btn" onclick="showAdminSection('ip-section')" style="background: #3b82f6;">📁 Visualizza Indirizzi IP Loggati</button>
+            <button type="button" class="action-btn" onclick="showAdminSection('ideas-section')" style="background: #8b5cf6;">💡 Visualizza Idee Inviate</button>
+            <button type="button" class="action-btn" onclick="showAdminSection('feedback-section')" style="background: #10b981;">💬 Visualizza Feedback</button>
+        </div>
+
+        <div id="ip-section" class="admin-sub-section" style="display: block;">
+            <h4>📁 Storico Indirizzi IP Registrati:</h4>
+            <pre>{{ history or 'Nessun IP registrato.' }}</pre>
+        </div>
+
+        <div id="ideas-section" class="admin-sub-section" style="display: none;">
+            <h4>💡 Idee Inviate dagli Utenti:</h4>
+            <pre>{{ ideas_list or 'Nessuna idea ricevuta.' }}</pre>
+        </div>
+
+        <div id="feedback-section" class="admin-sub-section" style="display: none;">
+            <h4>💬 Feedback Ricevuti:</h4>
+            <pre>{{ feedback_list or 'Nessun feedback ricevuto.' }}</pre>
+        </div>
+
+        <script>
+            function showAdminSection(sectionId) {
+                document.querySelectorAll('.admin-sub-section').forEach(el => el.style.display = 'none');
+                document.getElementById(sectionId).style.display = 'block';
+            }
+        </script>
+
     {% else %}
-        <h3>🔐 Accesso Riservato Creatore</h3>
         <form method="POST" action="/admin/login">
-            <label>Password Amministratore</label>
-            <input type="password" name="password" placeholder="Inserisci la password..." required>
-            <button type="submit" class="action-btn">Accedi alla Cronologia IP</button>
+            <label>Inserisci Password Amministratore</label>
+            <input type="password" name="password" placeholder="Password..." required>
+            <button type="submit" class="action-btn">🔑 Accedi all'Area Admin</button>
         </form>
     {% endif %}
 </div>
