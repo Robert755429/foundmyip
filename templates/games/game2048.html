@@ -2,38 +2,186 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2048 - FoundmyIp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2048 Puzzle - FoundmyIp</title>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .grid { display: grid; grid-template-columns: repeat(4, 70px); gap: 10px; background: #1e293b; padding: 10px; border-radius: 10px; }
-        .cell { width: 70px; height: 70px; background: #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: #f8fafc; }
-        .back-btn { margin-top: 20px; color: #38bdf8; text-decoration: none; font-weight: bold; }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; position: relative; }
+        .gear-btn { position: absolute; top: 15px; right: 15px; background: #1e293b; border: 1px solid #334155; color: #f8fafc; font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s; }
+        .gear-btn:hover { background: #334155; }
+        .game-card { background: #1e293b; padding: 20px; border-radius: 16px; border: 1px solid #334155; text-align: center; width: 95%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h1 { color: #f59e0b; margin: 0 0 10px 0; font-size: 1.4rem; }
+        .score-container { display: flex; justify-content: space-around; margin-bottom: 15px; font-weight: bold; font-size: 0.95rem; }
+        .score-box { background: #090d16; padding: 8px 15px; border-radius: 8px; border: 1px solid #334155; color: #38bdf8; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #090d16; padding: 10px; border-radius: 12px; border: 2px solid #334155; width: 100%; aspect-ratio: 1; margin-bottom: 15px; }
+        .tile { background: #334155; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: bold; border-radius: 8px; color: #fff; transition: all 0.1s ease; }
+        .tile-2 { background: #3b82f6; }
+        .tile-4 { background: #60a5fa; }
+        .tile-8 { background: #f97316; }
+        .tile-16 { background: #ea580c; }
+        .tile-32 { background: #ef4444; }
+        .tile-64 { background: #dc2626; }
+        .tile-128 { background: #eab308; font-size: 1.1rem; }
+        .tile-256 { background: #ca8a04; font-size: 1.1rem; }
+        .tile-512 { background: #10b981; font-size: 1.1rem; }
+        .tile-1024 { background: #059669; font-size: 1rem; }
+        .tile-2048 { background: #8b5cf6; font-size: 1rem; box-shadow: 0 0 12px #8b5cf6; }
+        .controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; width: 100%; max-width: 200px; margin-left: auto; margin-right: auto; }
+        .ctrl-btn { background: #8b5cf6; color: white; border: none; padding: 12px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .ctrl-btn:active { background: #7c3aed; }
+        .ctrl-up { grid-column: 2; }
+        .ctrl-left { grid-column: 1; }
+        .ctrl-down { grid-column: 2; }
+        .ctrl-right { grid-column: 3; }
+        .back-link { display: inline-block; margin-top: 10px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .back-link:hover { color: #38bdf8; text-decoration: underline; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100; padding: 20px; }
+        .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 350px; border: 1px solid #334155; text-align: left; }
+        .modal-content h3 { color: #f59e0b; margin-top: 0; }
+        .modal-close { background: #f59e0b; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; float: right; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>🧩 2048 Puzzle</h1>
-    <div class="grid" id="grid2048"></div>
-    <a href="/" class="back-btn">⬅ Torna alla Dashboard</a>
+    <button class="gear-btn" onclick="openModal()">⚙️</button>
+
+    <div class="game-card">
+        <h1>🔢 2048 Puzzle</h1>
+        <div class="score-container">
+            <div class="score-box">PUNTI: <span id="score">0</span></div>
+            <div class="score-box">RECORD: <span id="best">0</span></div>
+        </div>
+        <div class="grid" id="grid"></div>
+        <div class="controls">
+            <button class="ctrl-btn ctrl-up" onclick="move('up')">⬆️</button>
+            <button class="ctrl-btn ctrl-left" onclick="move('left')">⬅️</button>
+            <button class="ctrl-btn ctrl-down" onclick="move('down')">⬇️</button>
+            <button class="ctrl-btn ctrl-right" onclick="move('right')">➡️</button>
+        </div>
+        <a href="/" class="back-link">⬅ Torna alla Dashboard</a>
+    </div>
+
+    <div id="ruleModal" class="modal">
+        <div class="modal-content">
+            <h3>⚙️ Istruzioni 2048</h3>
+            <p>1. Scorri lo schermo o usa i tasti freccia per muovere i numeri.</p>
+            <p>2. Due tessere con lo stesso numero si uniscono sommandosi quando si scontrano.</p>
+            <p>3. Raggiungi la tessera **2048** per vincere!</p>
+            <button class="modal-close" onclick="closeModal()">Capito!</button>
+        </div>
+    </div>
 
 <script>
-let board = Array(16).fill(0);
-function render() {
-    const g = document.getElementById('grid2048');
-    g.innerHTML = '';
-    board.forEach(v => {
-        const c = document.createElement('div');
-        c.className = 'cell';
-        c.textContent = v > 0 ? v : '';
-        if(v > 0) c.style.background = '#8b5cf6';
-        g.appendChild(c);
-    });
+let board = Array(4).fill(0).map(() => Array(4).fill(0));
+let score = 0;
+let best = 0;
+
+function openModal() { document.getElementById('ruleModal').style.display = 'flex'; }
+function closeModal() { document.getElementById('ruleModal').style.display = 'none'; }
+
+function initGame() {
+    board = Array(4).fill(0).map(() => Array(4).fill(0));
+    score = 0;
+    addTile();
+    addTile();
+    updateView();
 }
+
 function addTile() {
-    let empty = board.map((v, i) => v === 0 ? i : null).filter(v => v !== null);
-    if(empty.length) board[empty[Math.floor(Math.random()*empty.length)]] = 2;
+    let empty = [];
+    for(let r=0; r<4; r++) for(let c=0; c<4; c++) if(board[r][c] === 0) empty.push({r, c});
+    if(empty.length > 0) {
+        let spot = empty[Math.floor(Math.random() * empty.length)];
+        board[spot.r][spot.c] = Math.random() < 0.9 ? 2 : 4;
+    }
 }
-addTile(); addTile(); render();
+
+function updateView() {
+    const gridEl = document.getElementById('grid');
+    gridEl.innerHTML = '';
+    for(let r=0; r<4; r++) {
+        for(let c=0; c<4; c++) {
+            let val = board[r][c];
+            let tile = document.createElement('div');
+            tile.className = `tile ${val ? 'tile-' + val : ''}`;
+            tile.textContent = val ? val : '';
+            gridEl.appendChild(tile);
+        }
+    }
+    document.getElementById('score').textContent = score;
+    if(score > best) best = score;
+    document.getElementById('best').textContent = best;
+}
+
+function slide(row) {
+    let arr = row.filter(val => val);
+    let missing = 4 - arr.length;
+    return arr.concat(Array(missing).fill(0));
+}
+
+function combine(row) {
+    for(let i=0; i<3; i++) {
+        if(row[i] !== 0 && row[i] === row[i+1]) {
+            row[i] *= 2;
+            score += row[i];
+            row[i+1] = 0;
+        }
+    }
+    return row;
+}
+
+function operate(row) {
+    let sl = slide(row);
+    let cb = combine(sl);
+    return slide(cb);
+}
+
+function move(dir) {
+    let past = JSON.stringify(board);
+    if(dir === 'left') {
+        for(let r=0; r<4; r++) board[r] = operate(board[r]);
+    } else if(dir === 'right') {
+        for(let r=0; r<4; r++) board[r] = operate(board[r].reverse()).reverse();
+    } else if(dir === 'up') {
+        for(let c=0; c<4; c++) {
+            let col = [board[0][c], board[1][c], board[2][c], board[3][c]];
+            let res = operate(col);
+            for(let r=0; r<4; r++) board[r][c] = res[r];
+        }
+    } else if(dir === 'down') {
+        for(let c=0; c<4; c++) {
+            let col = [board[0][c], board[1][c], board[2][c], board[3][c]].reverse();
+            let res = operate(col).reverse();
+            for(let r=0; r<4; r++) board[r][c] = res[r];
+        }
+    }
+    if(JSON.stringify(board) !== past) {
+        addTile();
+        updateView();
+    }
+}
+
+// Supporto Swipe Touch Senza Pull-to-Refresh
+let startX = 0, startY = 0;
+window.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+}, {passive: false});
+
+window.addEventListener('touchmove', e => {
+    e.preventDefault(); // Blocca il refresh del browser tirando giù
+}, {passive: false});
+
+window.addEventListener('touchend', e => {
+    let dx = e.changedTouches[0].clientX - startX;
+    let dy = e.changedTouches[0].clientY - startY;
+    if(Math.abs(dx) > Math.abs(dy)) {
+        if(Math.abs(dx) > 30) move(dx > 0 ? 'right' : 'left');
+    } else {
+        if(Math.abs(dy) > 30) move(dy > 0 ? 'down' : 'up');
+    }
+}, {passive: false});
+
+initGame();
 </script>
 </body>
 </html>
