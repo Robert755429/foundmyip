@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -11,6 +10,7 @@
     <button class="tab-btn {% if active_tab == 'speedtest' %}active{% endif %}" onclick="switchTab('speedtest')">⚡ Speed Test</button>
     <button class="tab-btn {% if active_tab == 'games' %}active{% endif %}" onclick="switchTab('games')">🕹️ Minigiochi</button>
     <button class="tab-btn {% if active_tab == 'submit' %}active{% endif %}" onclick="switchTab('submit')">💡 Idee & Feedback</button>
+    <button class="tab-btn {% if active_tab == 'updates' %}active{% endif %}" onclick="switchTab('updates')">🚀 Aggiornamenti</button>
     <button class="tab-btn {% if active_tab == 'admin' %}active{% endif %}" onclick="switchTab('admin')">🔐 Admin</button>
 </div>
 
@@ -36,6 +36,7 @@
     </form>
 </div>
 
+{% include 'components/updates.html' %}
 {% include 'components/admin.html' %}
 
 {% if result %}
