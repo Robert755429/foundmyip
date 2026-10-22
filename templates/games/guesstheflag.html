@@ -5,319 +5,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Indovina la Bandiera - FoundmyIp</title>
     <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #0f172a;
-            color: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 1.6rem;
-            margin-bottom: 5px;
-            color: #38bdf8;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 15px;
-            background: #1e293b;
-            padding: 12px 20px;
-            border-radius: 12px;
-            border: 1px solid #334155;
-            font-weight: bold;
-            font-size: 1.05rem;
-        }
-
-        .stats span {
-            color: #f59e0b;
-        }
-
-        .flag-box {
-            width: 100%;
-            height: 200px;
-            background: #1e293b;
-            border-radius: 12px;
-            border: 3px solid #334155;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .flag-img {
-            max-width: 90%;
-            max-height: 85%;
-            object-fit: contain;
-            border-radius: 4px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-        }
-
-        .option-btn {
-            background: #1e293b;
-            border: 2px solid #334155;
-            color: #f8fafc;
-            padding: 14px 20px;
-            border-radius: 10px;
-            font-size: 1.05rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .option-btn:hover {
-            border-color: #38bdf8;
-            background: #334155;
-        }
-
-        .option-btn.correct {
-            background: #166534 !important;
-            border-color: #22c55e !important;
-            color: #ffffff;
-        }
-
-        .option-btn.wrong {
-            background: #991b1b !important;
-            border-color: #ef4444 !important;
-            color: #ffffff;
-        }
-
-        .badge {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-        }
-
-        .message-box {
-            height: 30px;
-            margin-top: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        .back-btn {
-            margin-top: 20px;
-            color: #38bdf8;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: bold;
-        }
-
-        .back-btn:hover {
-            text-decoration: underline;
-        }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; position: relative; }
+        .gear-btn { position: absolute; top: 15px; right: 15px; background: #1e293b; border: 1px solid #334155; color: #f8fafc; font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s; }
+        .gear-btn:hover { background: #334155; }
+        .game-card { background: #1e293b; padding: 25px; border-radius: 16px; border: 1px solid #334155; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h1 { color: #0284c7; margin: 0 0 10px 0; font-size: 1.4rem; }
+        .flag-box { font-size: 4.5rem; margin: 15px 0; background: #090d16; padding: 15px; border-radius: 12px; border: 1px solid #334155; display: inline-block; min-width: 130px; }
+        .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .opt-btn { background: #334155; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.95rem; }
+        .opt-btn:hover { background: #475569; }
+        .score-box { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #38bdf8; }
+        .back-link { display: inline-block; margin-top: 10px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .back-link:hover { color: #38bdf8; text-decoration: underline; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100; padding: 20px; }
+        .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 350px; border: 1px solid #334155; text-align: left; }
+        .modal-content h3 { color: #0284c7; margin-top: 0; }
+        .modal-close { background: #0284c7; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; float: right; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
+    <button class="gear-btn" onclick="openModal()">⚙️</button>
 
-<div class="game-container">
-    <h1>🌐 Indovina la Bandiera</h1>
-
-    <div class="stats">
-        <div>PUNTI: <span id="score">0</span></div>
-        <div>RECORD: <span id="high-score">0</span></div>
+    <div class="game-card">
+        <h1>🌐 Indovina la Bandiera</h1>
+        <div class="score-box">PUNTI: <span id="score">0</span></div>
+        <div class="flag-box" id="flagDisplay">🇮🇹</div>
+        <div class="options" id="optionsContainer"></div>
+        <a href="/" class="back-link">⬅ Torna alla Dashboard</a>
     </div>
 
-    <div class="flag-box">
-        <img id="flagImage" class="flag-img" src="" alt="Bandiera">
+    <div id="ruleModal" class="modal">
+        <div class="modal-content">
+            <h3>⚙️ Istruzioni Bandiere</h3>
+            <p>1. Guarda l'emoji della bandiera mostrata (scelta tra i 195 Paesi del mondo).</p>
+            <p>2. Clicca sulla nazione corretta tra le quattro opzioni generate casualmente.</p>
+            <p>3. Accumula più punti possibile senza sbagliare!</p>
+            <button class="modal-close" onclick="closeModal()">Capito!</button>
+        </div>
     </div>
-
-    <div class="options-container" id="optionsContainer">
-        <button class="option-btn" onclick="checkAnswer(0)">
-            <span class="opt-text">Opzione A</span>
-            <span class="badge">A</span>
-        </button>
-        <button class="option-btn" onclick="checkAnswer(1)">
-            <span class="opt-text">Opzione B</span>
-            <span class="badge">B</span>
-        </button>
-        <button class="option-btn" onclick="checkAnswer(2)">
-            <span class="opt-text">Opzione C</span>
-            <span class="badge">C</span>
-        </button>
-    </div>
-
-    <div class="message-box" id="message"></div>
-
-    <a href="/" class="back-btn">⬅ Torna alla Dashboard</a>
-</div>
 
 <script>
-// Database Bandiere ISO del mondo in Italiano
-const FLAGS = [
-    { code: 'it', name: 'Italia' }, { code: 'fr', name: 'Francia' }, { code: 'de', name: 'Germania' },
-    { code: 'es', name: 'Spagna' }, { code: 'gb', name: 'Regno Unito' }, { code: 'us', name: 'Stati Uniti' },
-    { code: 'jp', name: 'Giappone' }, { code: 'br', name: 'Brasile' }, { code: 'ar', name: 'Argentina' },
-    { code: 'ca', name: 'Canada' }, { code: 'au', name: 'Australia' }, { code: 'pt', name: 'Portogallo' },
-    { code: 'nl', name: 'Paesi Bassi' }, { code: 'be', name: 'Belgio' }, { code: 'ch', name: 'Svizzera' },
-    { code: 'gr', name: 'Grecia' }, { code: 'se', name: 'Svezia' }, { code: 'no', name: 'Norvegia' },
-    { code: 'fi', name: 'Finlandia' }, { code: 'dk', name: 'Danimarca' }, { code: 'pl', name: 'Polonia' },
-    { code: 'ro', name: 'Romania' }, { code: 'mx', name: 'Messico' }, { code: 'co', name: 'Colombia' },
-    { code: 'cl', name: 'Cile' }, { code: 'pe', name: 'Perù' }, { code: 'cn', name: 'Cina' },
-    { code: 'in', name: 'India' }, { code: 'kr', name: 'Corea del Sud' }, { code: 'za', name: 'Sudafrica' },
-    { code: 'eg', name: 'Egitto' }, { code: 'ma', name: 'Marocco' }, { code: 'tr', name: 'Turchia' },
-    { code: 'sa', name: 'Arabia Saudita' }, { code: 'ae', name: 'Emirati Arabi Uniti' }, { code: 'ru', name: 'Russia' },
-    { code: 'ua', name: 'Ucraina' }, { code: 'at', name: 'Austria' }, { code: 'ie', name: 'Irlanda' },
-    { code: 'nz', name: 'Nuova Zelanda' }, { code: 'uy', name: 'Uruguay' }, { code: 'hr', name: 'Croazia' },
-    { code: 'sr', name: 'Serbia' }, { code: 'hu', name: 'Ungheria' }, { code: 'cz', name: 'Repubblica Ceca' },
-    { code: 'sk', name: 'Slovacchia' }, { code: 'bg', name: 'Bulgaria' }, { code: 'th', name: 'Thailandia' },
-    { code: 'vn', name: 'Vietnam' }, { code: 'id', name: 'Indonesia' }, { code: 'ph', name: 'Filippine' },
-    { code: 'my', name: 'Malesia' }, { code: 'sg', name: 'Singapore' }, { code: 'is', name: 'Islanda' },
-    { code: 'cu', name: 'Cuba' }, { code: 'jm', name: 'Giammapica' }, { code: 'ke', name: 'Kenya' },
-    { code: 'ng', name: 'Nigeria' }, { code: 'al', name: 'Albania' }, { code: 'dz', name: 'Algeria' }
+const allCountries = [
+    { flag: "🇦🇫", name: "Afghanistan" }, { flag: "🇦🇱", name: "Albania" }, { flag: "🇩🇿", name: "Algeria" },
+    { flag: "🇦🇩", name: "Andorra" }, { flag: "🇦🇴", name: "Angola" }, { flag: "🇦🇬", name: "Antigua e Barbuda" },
+    { flag: "🇸🇦", name: "Arabia Saudita" }, { flag: "🇦🇷", name: "Argentina" }, { flag: "🇦🇲", name: "Armenia" },
+    { flag: "🇦🇺", name: "Australia" }, { flag: "🇦🇹", name: "Austria" }, { flag: "🇦🇿", name: "Azerbaigian" },
+    { flag: "🇧🇸", name: "Bahamas" }, { flag: "🇧🇭", name: "Bahrein" }, { flag: "🇧🇩", name: "Bangladesh" },
+    { flag: "🇧🇧", name: "Barbados" }, { flag: "🇧🇪", name: "Belgio" }, { flag: "🇧🇿", name: "Belize" },
+    { flag: "🇧🇯", name: "Benin" }, { flag: "🇧🇹", name: "Bhutan" }, { flag: "🇧🇾", name: "Bielorussia" },
+    { flag: "🇧🇴", name: "Bolivia" }, { flag: "🇧🇦", name: "Bosnia ed Erzegovina" }, { flag: "🇧🇼", name: "Botswana" },
+    { flag: "🇧🇷", name: "Brasile" }, { flag: "🇧🇳", name: "Brunei" }, { flag: "🇧🇬", name: "Bulgaria" },
+    { flag: "🇧🇫", name: "Burkina Faso" }, { flag: "🇧🇮", name: "Burundi" }, { flag: "🇰🇭", name: "Cambogia" },
+    { flag: "🇨🇲", name: "Camerun" }, { flag: "🇨🇦", name: "Canada" }, { flag: "🇨🇻", name: "Capo Verde" },
+    { flag: "🇨🇦", name: "Ciad" }, { flag: "🇨🇱", name: "Cile" }, { flag: "🇨🇳", name: "Cina" },
+    { flag: "🇨🇾", name: "Cipro" }, { flag: "🇻🇦", name: "Città del Vaticano" }, { flag: "🇨🇴", name: "Colombia" },
+    { flag: "🇰🇲", name: "Comore" }, { flag: "🇨🇬", name: "Congo" }, { flag: "🇨🇩", name: "Congo (RDC)" },
+    { flag: "🇰🇷", name: "Corea del Sud" }, { flag: "🇰🇵", name: "Corea del Nord" }, { flag: "🇨🇮", name: "Costa d'Avorio" },
+    { flag: "🇨🇷", name: "Costa Rica" }, { flag: "🇭🇷", name: "Croazia" }, { flag: "🇨🇺", name: "Cuba" },
+    { flag: "🇩🇰", name: "Danimarca" }, { flag: "🇩🇲", name: "Dominica" }, { flag: "🇪🇨", name: "Ecuador" },
+    { flag: "🇪🇬", name: "Egitto" }, { flag: "🇸🇻", name: "El Salvador" }, { flag: "🇦🇪", name: "Emirati Arabi Uniti" },
+    { flag: "🇪🇷", name: "Eritrea" }, { flag: "🇪🇪", name: "Estonia" }, { flag: "🇸🇿", name: "Eswatini" },
+    { flag: "🇪🇹", name: "Etiopia" }, { flag: "🇫🇯", name: "Figi" }, { flag: "🇵🇭", name: "Filippine" },
+    { flag: "🇫🇮", name: "Finlandia" }, { flag: "🇫🇷", name: "Francia" }, { flag: "🇬🇦", name: "Gabon" },
+    { flag: "🇬🇲", name: "Gambia" }, { flag: "🇬🇪", name: "Georgia" }, { flag: "🇩🇪", name: "Germania" },
+    { flag: "🇬🇭", name: "Ghana" }, { flag: "🇯🇵", name: "Giappone" }, { flag: "🇯🇲", name: "Giamaica" },
+    { flag: "🇩🇯", name: "Gibuti" }, { flag: "🇯🇴", name: "Giordania" }, { flag: "🇬🇷", name: "Grecia" },
+    { flag: "🇬🇩", name: "Grenada" }, { flag: "🇬🇹", name: "Guatemala" }, { flag: "🇬🇳", name: "Guinea" },
+    { flag: "🇬🇼", name: "Guinea-Bissau" }, { flag: "🇬🇶", name: "Guinea Equatoriale" }, { flag: "🇬🇾", name: "Guyana" },
+    { flag: "🇭🇹", name: "Haiti" }, { flag: "🇭🇳", name: "Honduras" }, { flag: "🇮🇳", name: "India" },
+    { flag: "🇮🇩", name: "Indonesia" }, { flag: "🇮🇷", name: "Iran" }, { flag: "🇮🇶", name: "Iraq" },
+    { flag: "🇮🇪", name: "Irlanda" }, { flag: "🇮🇸", name: "Islanda" }, { flag: "🇲🇭", name: "Isole Marshall" },
+    { flag: "🇸🇧", name: "Isole Salomone" }, { flag: "🇮🇱", name: "Israele" }, { flag: "🇮🇹", name: "Italia" },
+    { flag: "🇰🇿", name: "Kazakistan" }, { flag: "🇰🇪", name: "Kenya" }, { flag: "🇰🇬", name: "Kirghizistan" },
+    { flag: "🇰🇮", name: "Kiribati" }, { flag: "🇰🇼", name: "Kuwait" }, { flag: "🇱🇦", name: "Laos" },
+    { flag: "🇱🇸", name: "Lesotho" }, { flag: "🇱🇻", name: "Lettonia" }, { flag: "🇱🇧", name: "Libano" },
+    { flag: "🇱🇷", name: "Liberia" }, { flag: "🇱🇾", name: "Lavia" }, { flag: "🇱🇮", name: "Liechtenstein" },
+    { flag: "🇱🇹", name: "Lituania" }, { flag: "🇱🇺", name: "Lussemburgo" }, { flag: "🇲🇰", name: "Macedonia del Nord" },
+    { flag: "🇲🇬", name: "Madagascar" }, { flag: "🇲🇼", name: "Malawi" }, { flag: "🇲🇾", name: "Malaysia" },
+    { flag: "🇲🇻", name: "Maldive" }, { flag: "🇲🇱", name: "Mali" }, { flag: "🇲🇹", name: "Malta" },
+    { flag: "🇲🇦", name: "Marocco" }, { flag: "🇲🇷", name: "Mauritania" }, { flag: "🇲🇺", name: "Mauritius" },
+    { flag: "🇲🇽", name: "Messico" }, { flag: "🇫🇲", name: "Micronesia" }, { flag: "🇲🇩", name: "Moldavia" },
+    { flag: "🇲🇨", name: "Monaco" }, { flag: "🇲🇳", name: "Mongolia" }, { flag: "🇲🇪", name: "Montenegro" },
+    { flag: "🇲🇿", name: "Mozambico" }, { flag: "🇲🇲", name: "Myanmar" }, { flag: "🇳🇦", name: "Namibia" },
+    { flag: "🇳🇷", name: "Nauru" }, { flag: "🇳🇵", name: "Nepal" }, { flag: "🇳🇮", name: "Nicaragua" },
+    { flag: "🇳🇪", name: "Niger" }, { flag: "🇳🇬", name: "Nigeria" }, { flag: "🇳🇴", name: "Norvegia" },
+    { flag: "🇳🇿", name: "Nuova Zelanda" }, { flag: "🇴🇲", name: "Oman" }, { flag: "🇳🇱", name: "Paesi Bassi" },
+    { flag: "🇵🇰", name: "Pakistan" }, { flag: "🇵🇼", name: "Palau" }, { flag: "🇵🇸", name: "Palestina" },
+    { flag: "🇵🇦", name: "Panama" }, { flag: "🇵🇬", name: "Papua Nuova Guinea" }, { flag: "🇵🇾", name: "Paraguay" },
+    { flag: "🇵🇪", name: "Perù" }, { flag: "🇵🇱", name: "Polonia" }, { flag: "🇵🇹", name: "Portogallo" },
+    { flag: "🇶🇦", name: "Qatar" }, { flag: "🇬🇧", name: "Regno Unito" }, { flag: "🇨🇿", name: "Repubblica Ceca" },
+    { flag: "🇨🇫", name: "Repubblica Centrafricana" }, { flag: "🇩🇴", name: "Repubblica Dominicana" },
+    { flag: "🇷🇴", name: "Romania" }, { flag: "🇷🇼", name: "Ruanda" }, { flag: "🇷🇺", name: "Russia" },
+    { flag: "🇰🇳", name: "Saint Kitts e Nevis" }, { flag: "🇱🇨", name: "Saint Lucia" }, { flag: "🇸🇻", name: "Saint Vincent e Grenadine" },
+    { flag: "🇼🇸", name: "Samoa" }, { flag: "🇸🇲", name: "San Marino" }, { flag: "🇸🇹", name: "São Tomé e Príncipe" },
+    { flag: "🇸🇳", name: "Senegal" }, { flag: "🇷🇸", name: "Serbia" }, { flag: "🇸🇨", name: "Seychelles" },
+    { flag: "🇸🇱", name: "Sierra Leone" }, { flag: "🇸🇬", name: "Singapore" }, { flag: "🇸🇾", name: "Siria" },
+    { flag: "🇸🇰", name: "Slovacchia" }, { flag: "🇸🇮", name: "Slovenia" }, { flag: "🇸🇴", name: "Somalia" },
+    { flag: "🇪🇸", name: "Spagna" }, { flag: "🇱🇰", name: "Sri Lanka" }, { flag: "🇺🇸", name: "Stati Uniti" },
+    { flag: "🇿🇦", name: "Sudafrica" }, { flag: "🇸🇩", name: "Sudan" }, { flag: "🇸🇸", name: "Sudan del Sud" },
+    { flag: "🇸🇷", name: "Suriname" }, { flag: "🇸🇪", name: "Svezia" }, { flag: "🇨🇭", name: "Svizzera" },
+    { flag: "🇹🇯", name: "Tagikistan" }, { flag: "🇹🇼", name: "Taiwan" }, { flag: "🇹🇿", name: "Tanzania" },
+    { flag: "🇹🇭", name: "Thailandia" }, { flag: "🇹🇱", name: "Timor Est" }, { flag: "🇹🇬", name: "Togo" },
+    { flag: "🇹🇴", name: "Tonga" }, { flag: "🇹🇹", name: "Trinidad e Tobago" }, { flag: "🇹🇳", name: "Tunisia" },
+    { flag: "🇹🇲", name: "Turkmenistan" }, { flag: "🇹🇷", name: "Turchia" }, { flag: "🇹🇻", name: "Tuvalu" },
+    { flag: "🇺🇦", name: "Ucraina" }, { flag: "🇺🇬", name: "Uganda" }, { flag: "🇭🇺", name: "Ungheria" },
+    { flag: "🇺🇾", name: "Uruguay" }, { flag: "🇺🇿", name: "Uzbekistan" }, { flag: "🇻🇺", name: "Vanuatu" },
+    { flag: "🇻🇪", name: "Venezuela" }, { flag: "🇻🇳", name: "Vietnam" }, { flag: "🇾🇪", name: "Yemen" },
+    { flag: "🇿🇲", name: "Zambia" }, { flag: "🇿🇼", name: "Zimbabwe" }
 ];
 
 let score = 0;
-let highScore = localStorage.getItem('flag_highscore') || 0;
-document.getElementById('high-score').textContent = highScore;
 
-let currentCorrectIndex = 0;
-let options = [];
-let isAnsweringAllowed = true;
+function openModal() { document.getElementById('ruleModal').style.display = 'flex'; }
+function closeModal() { document.getElementById('ruleModal').style.display = 'none'; }
 
-// Suoni sintetizzati sintetici tramite Web Audio API
-let audioCtx = null;
-function playSound(type) {
-    try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        const now = audioCtx.currentTime;
-
-        if (type === 'correct') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(523.25, now);
-            osc.frequency.setValueAtTime(659.25, now + 0.1);
-            gain.gain.setValueAtTime(0.15, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-            osc.start(now); osc.stop(now + 0.25);
-        } else {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(200, now);
-            osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
-            gain.gain.setValueAtTime(0.15, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-            osc.start(now); osc.stop(now + 0.2);
+function loadQuiz() {
+    const target = allCountries[Math.floor(Math.random() * allCountries.length)];
+    document.getElementById('flagDisplay').textContent = target.flag;
+    
+    let options = [target.name];
+    while(options.length < 4) {
+        let randomCountry = allCountries[Math.floor(Math.random() * allCountries.length)].name;
+        if(!options.includes(randomCountry)) {
+            options.push(randomCountry);
         }
-    } catch(e) {}
-}
-
-function loadNewFlag() {
-    isAnsweringAllowed = true;
-    document.getElementById('message').textContent = '';
+    }
     
-    const btns = document.querySelectorAll('.option-btn');
-    btns.forEach(b => {
-        b.classList.remove('correct', 'wrong');
-    });
-
-    // Seleziona paese corretto casuale
-    const correctCountry = FLAGS[Math.floor(Math.random() * FLAGS.length)];
-    
-    // Seleziona altri 2 paesi diversi per le opzioni errate
-    let wrong1, wrong2;
-    do {
-        wrong1 = FLAGS[Math.floor(Math.random() * FLAGS.length)];
-    } while (wrong1.code === correctCountry.code);
-
-    do {
-        wrong2 = FLAGS[Math.floor(Math.random() * FLAGS.length)];
-    } while (wrong2.code === correctCountry.code || wrong2.code === wrong1.code);
-
-    options = [correctCountry, wrong1, wrong2];
-    // Mescola le 3 opzioni
     options.sort(() => Math.random() - 0.5);
-
-    currentCorrectIndex = options.findIndex(o => o.code === correctCountry.code);
-
-    // Carica immagine della bandiera (SVG da flagcdn.com)
-    const img = document.getElementById('flagImage');
-    img.src = `https://flagcdn.com/w320/${correctCountry.code}.png`;
-
-    // Aggiorna testo dei pulsanti
-    const optTexts = document.querySelectorAll('.opt-text');
-    for (let i = 0; i < 3; i++) {
-        optTexts[i].textContent = options[i].name;
-    }
+    
+    const container = document.getElementById('optionsContainer');
+    container.innerHTML = '';
+    
+    options.forEach(opt => {
+        let btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.textContent = opt;
+        btn.onclick = () => {
+            if(opt === target.name) {
+                score += 10;
+            } else {
+                score = Math.max(0, score - 5);
+            }
+            document.getElementById('score').textContent = score;
+            loadQuiz();
+        };
+        container.appendChild(btn);
+    });
 }
 
-function checkAnswer(selectedIndex) {
-    if (!isAnsweringAllowed) return;
-    isAnsweringAllowed = false;
-
-    const btns = document.querySelectorAll('.option-btn');
-    const msg = document.getElementById('message');
-
-    if (selectedIndex === currentCorrectIndex) {
-        btns[selectedIndex].classList.add('correct');
-        score += 10;
-        playSound('correct');
-        msg.style.color = '#22c55e';
-        msg.textContent = '✨ Esatto! +10 punti';
-
-        if (score > highScore) {
-            highScore = score;
-            localStorage.setItem('flag_highscore', highScore);
-            document.getElementById('high-score').textContent = highScore;
-        }
-    } else {
-        btns[selectedIndex].classList.add('wrong');
-        btns[currentCorrectIndex].classList.add('correct');
-        score = 0; // Azzera punteggio in caso di errore
-        playSound('wrong');
-        msg.style.color = '#ef4444';
-        msg.textContent = `❌ Sbagliato! Era ${options[currentCorrectIndex].name}`;
-    }
-
-    document.getElementById('score').textContent = score;
-
-    // Passa alla prossima bandiera dopo 1.5 secondi
-    setTimeout(loadNewFlag, 1500);
-}
-
-// Avvio
-loadNewFlag();
+loadQuiz();
 </script>
 </body>
 </html>
