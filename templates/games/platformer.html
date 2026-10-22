@@ -3,114 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sblocca il Lucchetto - FoundmyIp</title>
+    <title>Super Mario Retro - FoundmyIp</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-        body { margin: 0; padding: 0; background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; touch-action: manipulation; position: relative; }
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; touch-action: none; position: relative; }
         .gear-btn { position: absolute; top: 15px; right: 15px; background: #1e293b; border: 1px solid #334155; color: #f8fafc; font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s; }
         .gear-btn:hover { background: #334155; }
-        .game-card { background: #1e293b; padding: 25px; border-radius: 16px; border: 1px solid #334155; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative; }
-        h1 { color: #8b5cf6; margin-top: 0; font-size: 1.4rem; }
-        .lock-container { position: relative; width: 180px; height: 180px; margin: 15px auto; cursor: pointer; }
-        .circle { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #334155; position: relative; background: rgba(9, 13, 22, 0.4); }
-        .target { position: absolute; width: 24px; height: 24px; background: #10b981; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px #10b981; }
-        .pointer { position: absolute; width: 12px; height: 80px; background: #ef4444; top: 10px; left: 84px; transform-origin: bottom center; border-radius: 6px; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
-        .score-box { font-size: 1.1rem; font-weight: bold; margin: 10px 0; color: #38bdf8; }
-        .btn-tap { background: #8b5cf6; color: white; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; transition: background 0.2s; }
-        .btn-tap:active { background: #7c3aed; }
-        .status-banner { margin-top: 10px; padding: 8px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; display: none; }
-        .status-banner.error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
-        .back-link { display: inline-block; margin-top: 15px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .game-card { background: #1e293b; padding: 20px; border-radius: 16px; border: 1px solid #334155; text-align: center; width: 95%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h1 { color: #e52521; margin: 0 0 10px 0; font-size: 1.4rem; }
+        canvas { background: #5c94fc; border-radius: 8px; width: 100%; max-width: 380px; height: 220px; border: 2px solid #334155; display: block; margin: 0 auto 15px auto; }
+        .controls { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+        .ctrl-btn { flex: 1; background: #e52521; color: white; border: none; padding: 14px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .ctrl-btn:active { background: #b91c1c; }
+        .back-link { display: inline-block; margin-top: 10px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
         .back-link:hover { color: #38bdf8; text-decoration: underline; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100; padding: 20px; }
         .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 350px; border: 1px solid #334155; text-align: left; }
-        .modal-content h3 { color: #8b5cf6; margin-top: 0; }
-        .modal-close { background: #8b5cf6; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; float: right; margin-top: 15px; font-weight: bold; }
+        .modal-content h3 { color: #e52521; margin-top: 0; }
+        .modal-close { background: #e52521; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; float: right; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
     <button class="gear-btn" onclick="openModal()">⚙️</button>
 
     <div class="game-card">
-        <h1>🔓 Sblocca il Lucchetto</h1>
-        <div class="score-box">LIVELLO: <span id="level">1</span></div>
-        <div class="lock-container" onclick="handleTap()">
-            <div class="circle">
-                <div class="target" id="target"></div>
-                <div class="pointer" id="pointer"></div>
-            </div>
+        <h1>🍄 Super Mario Retro</h1>
+        <canvas id="gameCanvas" width="380" height="220"></canvas>
+        <div class="controls">
+            <button class="ctrl-btn" ontouchstart="player.left=true" ontouchend="player.left=false" onmousedown="player.left=true" onmouseup="player.left=false">⬅️ MUOVITI</button>
+            <button class="ctrl-btn" style="background:#10b981;" ontouchstart="jump()" ontouchend="" onmousedown="jump()">⬆️ SALTA</button>
+            <button class="ctrl-btn" ontouchstart="player.right=true" ontouchend="player.right=false" onmousedown="player.right=true" onmouseup="player.right=false">➡️ MUOVITI</button>
         </div>
-        <button class="btn-tap" id="actionBtn" onclick="handleTap()">SBLOCCA!</button>
-        <div id="statusBanner" class="status-banner"></div>
         <a href="/" class="back-link">⬅ Torna alla Dashboard</a>
     </div>
 
     <div id="ruleModal" class="modal">
         <div class="modal-content">
-            <h3>⚙️ Istruzioni Gioco</h3>
-            <p>1. Clicca o tocca lo schermo quando la lancetta rossa si trova sopra il bersaglio verde.</p>
-            <p>2. Se centri il bersaglio, sali di livello e la velocità aumenta!</p>
-            <p>3. Se sbagli, potrai riprovare subito senza perdere la sessione.</p>
+            <h3>⚙️ Istruzioni Super Mario</h3>
+            <p>1. Usa i pulsanti laterali per muoverti a destra e sinistra.</p>
+            <p>2. Premi Salta per superare gli ostacoli.</p>
+            <p>3. Evita i nemici rossi e arriva in fondo alla piattaforma!</p>
             <button class="modal-close" onclick="closeModal()">Capito!</button>
         </div>
     </div>
 
 <script>
-let level = 1;
-let angle = 0;
-let targetAngle = 90;
-let speed = 2;
-let direction = 1;
-let isMoving = true;
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-function openModal() { document.getElementById('ruleModal').style.display = 'flex'; isMoving = false; }
-function closeModal() { document.getElementById('ruleModal').style.display = 'none'; isMoving = true; }
+let player = { x: 50, y: 150, w: 20, h: 25, dx: 0, dy: 0, speed: 3, jumpPower: -8, grounded: false, left: false, right: false };
+let gravity = 0.4;
+let obstacles = [{x: 250, y: 160, w: 25, h: 40}];
+let score = 0;
 
-function updateTarget() {
-    targetAngle = Math.floor(Math.random() * 300) + 30;
-    const rad = (targetAngle - 90) * (Math.PI / 180);
-    const r = 70;
-    const x = 90 + r * Math.cos(rad);
-    const y = 90 + r * Math.sin(rad);
-    const t = document.getElementById('target');
-    t.style.left = x + 'px';
-    t.style.top = y + 'px';
-}
+function openModal() { document.getElementById('ruleModal').style.display = 'flex'; }
+function closeModal() { document.getElementById('ruleModal').style.display = 'none'; }
 
-function gameLoop() {
-    if (isMoving) {
-        angle = (angle + speed * direction) % 360;
-        if (angle < 0) angle += 360;
-        document.getElementById('pointer').style.transform = `rotate(${angle}deg)`;
-    }
-    requestAnimationFrame(gameLoop);
-}
-
-function handleTap() {
-    if (!isMoving) return;
-    const diff = Math.abs(angle - targetAngle);
-    const banner = document.getElementById('statusBanner');
-    
-    if (diff <= 22 || diff >= 338) {
-        level++;
-        speed += 0.3;
-        direction *= -1;
-        document.getElementById('level').textContent = level;
-        banner.style.display = 'none';
-        updateTarget();
-    } else {
-        banner.textContent = "❌ Mancato! Riprova.";
-        banner.className = "status-banner error";
-        banner.style.display = 'block';
-        level = 1;
-        speed = 2;
-        document.getElementById('level').textContent = level;
-        updateTarget();
+function jump() {
+    if(player.grounded) {
+        player.dy = player.jumpPower;
+        player.grounded = false;
     }
 }
 
-updateTarget();
-gameLoop();
+function update() {
+    if(player.left) player.dx = -player.speed;
+    else if(player.right) player.dx = player.speed;
+    else player.dx = 0;
+
+    player.x += player.dx;
+    player.dy += gravity;
+    player.y += player.dy;
+
+    if(player.y > 175) {
+        player.y = 175;
+        player.dy = 0;
+        player.grounded = true;
+    }
+
+    if(player.x < 0) player.x = 0;
+    if(player.x > canvas.width - 20) player.x = canvas.width - 20;
+
+    // Obstacles loop
+    obstacles.forEach(obs => {
+        obs.x -= 2;
+        if(obs.x < -30) obs.x = canvas.width + Math.random() * 100;
+        
+        // Collision check
+        if(player.x < obs.x + obs.w && player.x + player.w > obs.x && player.y < obs.y + obs.h && player.y + player.h > obs.y) {
+            player.x = 50;
+            score = 0;
+        }
+    });
+
+    score++;
+}
+
+function draw() {
+    ctx.fillStyle = '#5c94fc';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Ground
+    ctx.fillStyle = '#e52521';
+    ctx.fillRect(0, 200, canvas.width, 20);
+
+    // Player
+    ctx.fillStyle = '#facc15';
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+
+    // Obstacles
+    ctx.fillStyle = '#10b981';
+    obstacles.forEach(obs => ctx.fillRect(obs.x, obs.y, obs.w, obs.h));
+
+    // Score
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText("PUNTI: " + score, 15, 25);
+}
+
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+
+loop();
 </script>
 </body>
 </html>
