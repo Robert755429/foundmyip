@@ -3,471 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Mario Retro - FoundmyIp</title>
+    <title>Sblocca il Lucchetto - FoundmyIp</title>
     <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #0f172a;
-            color: #ffffff;
-            font-family: 'Courier New', monospace, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-
-        .game-wrapper {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 800px;
-            padding: 10px;
-        }
-
-        .hud {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #000;
-            padding: 12px 16px;
-            border: 3px solid #e69c24;
-            border-radius: 8px 8px 0 0;
-            font-size: 11px;
-            color: #fff;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
-        }
-
-        .hud div span {
-            color: #f7d840;
-            display: block;
-            margin-top: 2px;
-        }
-
-        canvas {
-            background-color: #5c94fc;
-            border: 3px solid #e69c24;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            image-rendering: pixelated;
-            width: 100%;
-            max-height: 400px;
-            touch-action: none;
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .overlay h1 {
-            color: #e52521;
-            text-shadow: 3px 3px 0 #000;
-            font-size: 22px;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            background: #e69c24;
-            color: #000;
-            border: none;
-            padding: 12px 24px;
-            font-size: 12px;
-            font-weight: bold;
-            font-family: inherit;
-            cursor: pointer;
-            border-radius: 4px;
-            box-shadow: 0 4px 0 #996200;
-            margin-top: 15px;
-            text-transform: uppercase;
-        }
-
-        .touch-controls {
-            display: none;
-            width: 100%;
-            max-width: 800px;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            padding: 0 10px;
-        }
-
-        @media (max-width: 768px) {
-            .touch-controls { display: flex; }
-        }
-
-        .dpad, .action-btns { display: flex; gap: 10px; }
-
-        .t-btn {
-            width: 55px;
-            height: 55px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            color: white;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: manipulation;
-        }
-
-        .back-link {
-            margin-top: 15px;
-            color: #38bdf8;
-            text-decoration: none;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        .back-link:hover { text-decoration: underline; }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        body { margin: 0; padding: 0; background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; touch-action: manipulation; position: relative; }
+        .gear-btn { position: absolute; top: 15px; right: 15px; background: #1e293b; border: 1px solid #334155; color: #f8fafc; font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s; }
+        .gear-btn:hover { background: #334155; }
+        .game-card { background: #1e293b; padding: 25px; border-radius: 16px; border: 1px solid #334155; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative; }
+        h1 { color: #8b5cf6; margin-top: 0; font-size: 1.4rem; }
+        .lock-container { position: relative; width: 180px; height: 180px; margin: 15px auto; cursor: pointer; }
+        .circle { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #334155; position: relative; background: rgba(9, 13, 22, 0.4); }
+        .target { position: absolute; width: 24px; height: 24px; background: #10b981; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px #10b981; }
+        .pointer { position: absolute; width: 12px; height: 80px; background: #ef4444; top: 10px; left: 84px; transform-origin: bottom center; border-radius: 6px; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+        .score-box { font-size: 1.1rem; font-weight: bold; margin: 10px 0; color: #38bdf8; }
+        .btn-tap { background: #8b5cf6; color: white; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; transition: background 0.2s; }
+        .btn-tap:active { background: #7c3aed; }
+        .status-banner { margin-top: 10px; padding: 8px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; display: none; }
+        .status-banner.error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
+        .back-link { display: inline-block; margin-top: 15px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .back-link:hover { color: #38bdf8; text-decoration: underline; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100; padding: 20px; }
+        .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 350px; border: 1px solid #334155; text-align: left; }
+        .modal-content h3 { color: #8b5cf6; margin-top: 0; }
+        .modal-close { background: #8b5cf6; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; float: right; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
+    <button class="gear-btn" onclick="openModal()">⚙️</button>
 
-<div class="game-wrapper">
-    <div class="hud">
-        <div>MARIO<span id="score">000000</span></div>
-        <div>MONETE<span id="coins">🪙 x00</span></div>
-        <div>LIVELLO<span id="level">01/50</span></div>
-        <div>TEMPO<span id="time">300</span></div>
-        <div><button class="btn" style="padding: 4px 8px; margin: 0; font-size: 9px;" onclick="togglePause()">⏸</button></div>
-    </div>
-
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
-
-    <div id="gameOverlay" class="overlay" style="display: none;">
-        <h1 id="overlayTitle">PAUSA</h1>
-        <p id="overlayMessage">Premi per riprendere</p>
-        <button id="overlayBtn" class="btn" onclick="resumeGame()">RIPRENDI</button>
-    </div>
-
-    <div class="touch-controls">
-        <div class="dpad">
-            <div class="t-btn" id="btnLeft">◀</div>
-            <div class="t-btn" id="btnRight">▶</div>
+    <div class="game-card">
+        <h1>🔓 Sblocca il Lucchetto</h1>
+        <div class="score-box">LIVELLO: <span id="level">1</span></div>
+        <div class="lock-container" onclick="handleTap()">
+            <div class="circle">
+                <div class="target" id="target"></div>
+                <div class="pointer" id="pointer"></div>
+            </div>
         </div>
-        <div class="action-btns">
-            <div class="t-btn" id="btnJump" style="background: rgba(229,37,33,0.6);">▲</div>
+        <button class="btn-tap" id="actionBtn" onclick="handleTap()">SBLOCCA!</button>
+        <div id="statusBanner" class="status-banner"></div>
+        <a href="/" class="back-link">⬅ Torna alla Dashboard</a>
+    </div>
+
+    <div id="ruleModal" class="modal">
+        <div class="modal-content">
+            <h3>⚙️ Istruzioni Gioco</h3>
+            <p>1. Clicca o tocca lo schermo quando la lancetta rossa si trova sopra il bersaglio verde.</p>
+            <p>2. Se centri il bersaglio, sali di livello e la velocità aumenta!</p>
+            <p>3. Se sbagli, potrai riprovare subito senza perdere la sessione.</p>
+            <button class="modal-close" onclick="closeModal()">Capito!</button>
         </div>
     </div>
-
-    <a href="/" class="back-link">⬅ Torna alla Dashboard di FoundmyIp</a>
-</div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+let level = 1;
+let angle = 0;
+let targetAngle = 90;
+let speed = 2;
+let direction = 1;
+let isMoving = true;
 
-let audioCtx = null;
-function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-}
+function openModal() { document.getElementById('ruleModal').style.display = 'flex'; isMoving = false; }
+function closeModal() { document.getElementById('ruleModal').style.display = 'none'; isMoving = true; }
 
-function playSound(type) {
-    try {
-        initAudio();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        const now = audioCtx.currentTime;
-
-        if (type === 'jump') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-            osc.start(now); osc.stop(now + 0.15);
-        } else if (type === 'coin') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(987.77, now);
-            osc.frequency.setValueAtTime(1318.51, now + 0.08);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            osc.start(now); osc.stop(now + 0.3);
-        }
-    } catch(e) {}
-}
-
-const TILE_SIZE = 32;
-const GRAVITY = 0.45;
-const MAX_LEVELS = 50;
-
-let currentLevel = 1;
-let score = 0;
-let coins = 0;
-let levelTime = 300;
-let isPaused = false;
-let isGameOver = false;
-let cameraX = 0;
-let timerInterval = null;
-
-const keys = { left: false, right: false, jump: false };
-
-window.addEventListener('keydown', e => {
-    if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
-    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
-        if (!keys.jump && mario.grounded && !isPaused && !isGameOver) {
-            mario.vy = -mario.jumpPower;
-            mario.grounded = false;
-            playSound('jump');
-        }
-        keys.jump = true;
-    }
-    if (e.code === 'KeyP') togglePause();
-});
-
-window.addEventListener('keyup', e => {
-    if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
-    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.jump = false;
-});
-
-function setupTouchBtn(id, keyProp) {
-    const btn = document.getElementById(id);
-    if(!btn) return;
-    btn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (keyProp === 'jump') {
-            if (mario.grounded && !isPaused && !isGameOver) {
-                mario.vy = -mario.jumpPower;
-                mario.grounded = false;
-                playSound('jump');
-            }
-            keys.jump = true;
-        } else {
-            keys[keyProp] = true;
-        }
-    });
-    btn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        keys[keyProp] = false;
-    });
-}
-setupTouchBtn('btnLeft', 'left');
-setupTouchBtn('btnRight', 'right');
-setupTouchBtn('btnJump', 'jump');
-
-const mario = { x: 50, y: 200, w: 28, h: 32, vx: 0, vy: 0, speed: 3.8, jumpPower: 10.5, grounded: false, facing: 'right' };
-let mapBlocks = [];
-let enemies = [];
-let castleX = 0;
-
-function generateLevel(lvlNum) {
-    mapBlocks = [];
-    enemies = [];
-    cameraX = 0;
-    levelTime = Math.max(180, 320 - lvlNum * 2);
-
-    const levelWidth = 60 + lvlNum * 8;
-    const groundY = 10;
-
-    for (let x = 0; x < levelWidth; x++) {
-        const isHole = (lvlNum > 1) && (x > 15 && x < levelWidth - 15) && (x % 15 === 0);
-        if (!isHole) {
-            mapBlocks.push({ x: x * TILE_SIZE, y: groundY * TILE_SIZE, type: 'ground' });
-            mapBlocks.push({ x: x * TILE_SIZE, y: (groundY + 1) * TILE_SIZE, type: 'ground' });
-        }
-    }
-
-    for (let x = 10; x < levelWidth - 20; x++) {
-        if (x % 16 === 0) {
-            mapBlocks.push({ x: x * TILE_SIZE, y: (groundY - 1) * TILE_SIZE, type: 'pipe_top' });
-            mapBlocks.push({ x: x * TILE_SIZE, y: (groundY - 2) * TILE_SIZE, type: 'pipe_body' });
-        }
-        if (x % 6 === 0) {
-            mapBlocks.push({ x: x * TILE_SIZE, y: (groundY - 4) * TILE_SIZE, type: 'question', used: false, hasItem: 'coin' });
-            enemies.push({ x: x * TILE_SIZE, y: (groundY - 1) * TILE_SIZE, w: 28, h: 28, vx: -1.2, alive: true });
-        }
-    }
-
-    castleX = (levelWidth - 6) * TILE_SIZE;
-    mario.x = 60;
-    mario.y = (groundY - 2) * TILE_SIZE;
-    mario.vx = 0; mario.vy = 0;
-
-    document.getElementById('level').textContent = `${lvlNum < 10 ? '0' + lvlNum : lvlNum}/50`;
-    
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        if (!isPaused && !isGameOver) {
-            levelTime--;
-            document.getElementById('time').textContent = levelTime;
-            if (levelTime <= 0) handleGameOver("TEMPO SCADUTO!");
-        }
-    }, 1000);
-}
-
-function drawSprite(type, x, y, state) {
-    ctx.save();
-    ctx.translate(Math.floor(x - cameraX), Math.floor(y));
-
-    if (type === 'mario') {
-        ctx.fillStyle = '#e52521'; ctx.fillRect(4, 0, 20, 8);
-        ctx.fillStyle = '#6b4400'; ctx.fillRect(2, 8, 24, 6);
-        ctx.fillStyle = '#f7d840'; ctx.fillRect(6, 6, 6, 4);
-        ctx.fillStyle = '#e52521'; ctx.fillRect(4, 14, 20, 10);
-        ctx.fillStyle = '#0020c2'; ctx.fillRect(6, 20, 16, 12);
-    } else if (type === 'ground') {
-        ctx.fillStyle = '#d84800'; ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
-        ctx.fillStyle = '#fcb070'; ctx.fillRect(2, 2, TILE_SIZE - 4, 4);
-    } else if (type === 'question') {
-        ctx.fillStyle = state ? '#808080' : '#fcb000'; ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
-        if (!state) { ctx.fillStyle = '#fff'; ctx.font = 'bold 18px sans-serif'; ctx.fillText('?', 10, 23); }
-    } else if (type === 'pipe_top' || type === 'pipe_body') {
-        ctx.fillStyle = '#00a800'; ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
-        ctx.fillStyle = '#80d010'; ctx.fillRect(2, 2, 6, TILE_SIZE - 4);
-    } else if (type === 'goomba') {
-        ctx.fillStyle = '#a81000'; ctx.fillRect(4, 4, 20, 16);
-        ctx.fillStyle = '#000'; ctx.fillRect(6, 20, 6, 8); ctx.fillRect(16, 20, 6, 8);
-    }
-    ctx.restore();
-}
-
-function update() {
-    if (isPaused || isGameOver) return;
-
-    if (keys.left) { mario.vx = -mario.speed; mario.facing = 'left'; }
-    else if (keys.right) { mario.vx = mario.speed; mario.facing = 'right'; }
-    else { mario.vx *= 0.8; }
-
-    mario.vy += GRAVITY;
-    mario.x += mario.vx; checkCollisionX();
-    mario.y += mario.vy; mario.grounded = false; checkCollisionY();
-
-    if (mario.x - cameraX > 350) cameraX = mario.x - 350;
-    if (mario.y > canvas.height + 50) handleGameOver("SEI CADUTO NEL VUOTO!");
-
-    enemies.forEach(e => {
-        if (!e.alive) return;
-        e.x += e.vx;
-        if (mario.x < e.x + e.w && mario.x + mario.w > e.x && mario.y < e.y + e.h && mario.y + mario.h > e.y) {
-            if (mario.vy > 0 && mario.y + mario.h - mario.vy <= e.y + 12) {
-                e.alive = false; mario.vy = -7; score += 200; playSound('jump');
-            } else {
-                handleGameOver("SEI STATO COLPITO!");
-            }
-        }
-    });
-
-    if (mario.x >= castleX) {
-        if (currentLevel < MAX_LEVELS) {
-            currentLevel++; score += 1000; playSound('coin'); generateLevel(currentLevel);
-        } else {
-            handleGameOver("HAI COMPLETATO TUTTI I 50 LIVELLI!");
-        }
-    }
-
-    document.getElementById('score').textContent = String(score).padStart(6, '0');
-    document.getElementById('coins').textContent = `🪙 x${String(coins).padStart(2, '0')}`;
-}
-
-function checkCollisionX() {
-    mapBlocks.forEach(b => {
-        if (mario.x < b.x + TILE_SIZE && mario.x + mario.w > b.x && mario.y < b.y + TILE_SIZE && mario.y + mario.h > b.y) {
-            if (mario.vx > 0) mario.x = b.x - mario.w;
-            else if (mario.vx < 0) mario.x = b.x + TILE_SIZE;
-        }
-    });
-}
-
-function checkCollisionY() {
-    mapBlocks.forEach(b => {
-        if (mario.x < b.x + TILE_SIZE && mario.x + mario.w > b.x && mario.y < b.y + TILE_SIZE && mario.y + mario.h > b.y) {
-            if (mario.vy > 0) {
-                mario.y = b.y - mario.h; mario.vy = 0; mario.grounded = true;
-            } else if (mario.vy < 0) {
-                mario.y = b.y + TILE_SIZE; mario.vy = 0;
-                if (b.type === 'question' && !b.used) {
-                    b.used = true; coins++; score += 100; playSound('coin');
-                }
-            }
-        }
-    });
-}
-
-function render() {
-    ctx.fillStyle = '#5c94fc';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    mapBlocks.forEach(b => {
-        if (b.x + TILE_SIZE > cameraX && b.x < cameraX + canvas.width) {
-            drawSprite(b.type, b.x, b.y, b.used);
-        }
-    });
-
-    ctx.fillStyle = '#d84800';
-    ctx.fillRect(castleX - cameraX, 5 * TILE_SIZE, 4 * TILE_SIZE, 5 * TILE_SIZE);
-
-    enemies.forEach(e => {
-        if (e.alive && e.x + e.w > cameraX && e.x < cameraX + canvas.width) {
-            drawSprite('goomba', e.x, e.y);
-        }
-    });
-
-    drawSprite('mario', mario.x, mario.y);
-}
-
-function togglePause() {
-    if (isGameOver) return;
-    isPaused = !isPaused;
-    document.getElementById('gameOverlay').style.display = isPaused ? 'flex' : 'none';
-}
-
-function resumeGame() {
-    isPaused = false;
-    document.getElementById('gameOverlay').style.display = 'none';
-}
-
-function handleGameOver(reason) {
-    isGameOver = true;
-    clearInterval(timerInterval);
-    document.getElementById('overlayTitle').textContent = "GAME OVER";
-    document.getElementById('overlayMessage').textContent = reason;
-    document.getElementById('overlayBtn').textContent = "RIPROVA";
-    document.getElementById('overlayBtn').onclick = () => {
-        isGameOver = false;
-        generateLevel(currentLevel);
-        document.getElementById('gameOverlay').style.display = 'none';
-    };
-    document.getElementById('gameOverlay').style.display = 'flex';
+function updateTarget() {
+    targetAngle = Math.floor(Math.random() * 300) + 30;
+    const rad = (targetAngle - 90) * (Math.PI / 180);
+    const r = 70;
+    const x = 90 + r * Math.cos(rad);
+    const y = 90 + r * Math.sin(rad);
+    const t = document.getElementById('target');
+    t.style.left = x + 'px';
+    t.style.top = y + 'px';
 }
 
 function gameLoop() {
-    update();
-    render();
+    if (isMoving) {
+        angle = (angle + speed * direction) % 360;
+        if (angle < 0) angle += 360;
+        document.getElementById('pointer').style.transform = `rotate(${angle}deg)`;
+    }
     requestAnimationFrame(gameLoop);
 }
 
-generateLevel(1);
+function handleTap() {
+    if (!isMoving) return;
+    const diff = Math.abs(angle - targetAngle);
+    const banner = document.getElementById('statusBanner');
+    
+    if (diff <= 22 || diff >= 338) {
+        level++;
+        speed += 0.3;
+        direction *= -1;
+        document.getElementById('level').textContent = level;
+        banner.style.display = 'none';
+        updateTarget();
+    } else {
+        banner.textContent = "❌ Mancato! Riprova.";
+        banner.className = "status-banner error";
+        banner.style.display = 'block';
+        level = 1;
+        speed = 2;
+        document.getElementById('level').textContent = level;
+        updateTarget();
+    }
+}
+
+updateTarget();
 gameLoop();
 </script>
 </body>
