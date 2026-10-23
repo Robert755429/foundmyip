@@ -60,8 +60,6 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 500px; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border-color); }
         .modal-close { float: right; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
-        .card-version-footer { margin-top: 20px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 10px; }
-        .card-version-footer span { font-size: 0.75rem; color: #94a3b8; }
     </style>
 </head>
 <body class="{{ theme }}">
@@ -204,6 +202,11 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if(t[key]) el.textContent = t[key];
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if(t[key]) el.placeholder = t[key];
             });
 
             const btns = document.querySelectorAll('.top-scroll-nav .tab-btn');
