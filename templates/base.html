@@ -22,10 +22,12 @@
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.3s ease; }
         .container { width: 100%; max-width: 700px; flex: 1; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
-        h1 { font-size: 1.4rem; margin: 0; color: var(--accent-color); }
-        .controls-wrapper { display: flex; gap: 8px; }
-        select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 12px 18px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
+        h1 { font-size: 1.3rem; margin: 0; color: var(--accent-color); font-weight: 800; display: flex; align-items: center; gap: 6px; }
+        
+        .header-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+        .control-select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 600; outline: none; transition: border-color 0.2s; }
+        .control-select:focus, .control-select:hover { border-color: var(--accent-color); }
 
         .top-scroll-nav { display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: var(--accent-color) var(--card-bg); -webkit-overflow-scrolling: touch; }
         .top-scroll-nav::-webkit-scrollbar { height: 6px; }
@@ -58,14 +60,16 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 500px; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border-color); }
         .modal-close { float: right; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
+        .card-version-footer { margin-top: 20px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 10px; }
+        .card-version-footer span { font-size: 0.75rem; color: #94a3b8; }
     </style>
 </head>
 <body class="{{ theme }}">
     <div class="container">
         <header>
             <h1>🌐 FoundmyIp</h1>
-            <div class="controls-wrapper">
-                <select id="langSelect" onchange="changeLanguage(this.value)">
+            <div class="header-controls">
+                <select id="langSelect" class="control-select" onchange="changeLanguage(this.value)">
                     <option value="it">🇮🇹 IT</option>
                     <option value="en">🇬🇧 EN</option>
                     <option value="es">🇪🇸 ES</option>
@@ -74,8 +78,8 @@
                     <option value="ar">🇸🇦 العربية</option>
                 </select>
 
-                <select id="themeSelect" onchange="changeTheme(this.value)">
-                    <option value="cyber">Cyber</option>
+                <select id="themeSelect" class="control-select" onchange="changeTheme(this.value)">
+                    <option value="cyber">🎨 Cyber</option>
                     <option value="matrix">Matrix</option>
                     <option value="ocean">Ocean</option>
                     <option value="light">Light</option>
@@ -124,7 +128,6 @@
         </div>
     </div>
 
-    <!-- Collegamento al file esterno delle traduzioni -->
     <script src="{{ url_for('static', filename='translations.js') }}"></script>
 
     <script>
