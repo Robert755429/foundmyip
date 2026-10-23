@@ -1,34 +1,32 @@
 const translations = {
     it: {
-        // Tab Nav
         tab_phone: "📱 Telefono", tab_ip: "🌐 IP Lookup", tab_myip: "📍 Il Mio IP", tab_password: "🔐 Password",
         tab_qrcode: "📷 QR Code", tab_speedtest: "⚡ Speed Test", tab_games: "🕹️ Minigiochi", tab_submit: "💡 Idee & Feedback", tab_admin: "🔐 Admin",
         
-        // Componenti
         phone_title: "Analizzatore Numeri", phone_label: "Inserisci Numero (es. +39XXXXXXXXXX)", phone_btn: "Avvia Analisi Telefono",
         ip_title: "Lookup IP & Porte", ip_label: "Inserisci IP (es. 8.8.8.8)", ip_btn: "Scansiona Indirizzo IP",
         myip_title: "Localizza il tuo Indirizzo IP & GPS", myip_desc: "Rileva istantaneamente il tuo IP pubblico, la posizione approssimativa dalla rete e le coordinate GPS ad alta precisione del dispositivo.", myip_btn: "Localizza il Mio IP Adesso",
         pass_title: "Generatore & Tester Password", pass_len: "Lunghezza Password:", pass_btn: "Genera Nuova Password", pass_placeholder: "La tua password apparirà qui...",
         qr_title: "Generatore QR Code", qr_label: "Inserisci un link o un testo", qr_btn: "Crea QR Code",
         speed_title: "Speed Test Rapido (Ping)", speed_desc: "Misura la latenza di risposta della tua connessione verso il server.", speed_btn: "Avvia Test Latenza",
+        
         games_title: "Area Intrattenimento & Minigiochi", games_desc: "Seleziona un gioco per iniziare subito:",
         game_mario: "🍄 Super Mario Retro (50 Livelli)", game_lock: "🔓 Sblocca il Lucchetto Infinito", game_flag: "🌐 Indovina la Bandiera del Mondo", game_2048: "🔢 2048 Puzzle", game_tris: "❌ Tris (vs AI & 1vs1) ⭕",
-        submit_title: "Invia una Nuova Idea o un Feedback", submit_type: "Seleziona Tipo", opt_idea: "💡 Idea per il sito", opt_feedback: "💬 Feedback / Parere", submit_msg: "Il tuo messaggio:", submit_placeholder: "Scrivi qui...", submit_btn: "Invia Messaggio",
-        admin_title: "Area Amministratore Riservata", admin_label: "Inserisci Password Amministratore", admin_placeholder: "Password...", admin_btn: "Accedi all'Area Admin",
+        game_instructions_btn: "⚙️ Come si Gioca", game_instructions_title: "📖 Istruzioni del Gioco",
         
-        // Storico Aggiornamenti (Sotto le Schede)
+        submit_title: "Invia una Nuova Idea o un Feedback", submit_type: "Seleziona Tipo", opt_idea: "💡 Idea per il sito", opt_feedback: "💬 Feedback / Parere", submit_msg: "Il tuo messaggio:", submit_placeholder: "Scrivi qui...", submit_btn: "Invia Messaggio",
+        
         upd_title: "🚀 Storico Aggiornamenti",
         upd_v4_title: "v4.0.0 Pro (Ultimate Edition) - Ottobre 2026",
         upd_v4_1: "Multilingua completo (IT, EN, ES, PT, ZH, AR) con supporto RTL per l'arabo.",
         upd_v4_2: "Dataset completo di tutti i 195 Paesi per il gioco delle bandiere.",
-        upd_v4_3: "Istruzioni (⚙️) su tutti i minigiochi e fix touch/pull-to-refresh per 2048.",
+        upd_v4_3: "Istruzioni (⚙️) su tutti i minigiochi e fix 2048.",
         upd_v3_title: "v3.5.0 GPS & Admin - Ottobre 2026",
         upd_v3_1: "Geolocalizzazione GPS ad alta precisione.",
         upd_v3_2: "Pannello Admin avanzato e invio Idee/Feedback.",
         upd_v2_title: "v2.0.0 Suite Minigiochi - Settembre 2026",
         upd_v2_1: "Lancio suite minigiochi, Speed Test e QR Code.",
         
-        // Footer & Modali
         rights: "Tutti i diritti riservati.", license: "Licenza", privacyLink: "Informativa sulla Privacy & Cookie", termsLink: "Termini di Servizio",
         cookieTitle: "🔒 Accettazione Cookie Richiesta", cookieText: "Per poter utilizzare FoundmyIp è necessario accettare i cookie tecnici.", cookieBtn: "Accetta e Prosegui",
         privacyTitle: "Informativa sulla Privacy", privacyP1: "1. Trattamento Dati: Registriamo gli IP per sicurezza.", privacyP2: "2. Conservazione: Gli IP vengono cancellati dopo 10 giorni.",
@@ -37,7 +35,6 @@ const translations = {
     en: {
         tab_phone: "📱 Phone", tab_ip: "🌐 IP Lookup", tab_myip: "📍 My IP", tab_password: "🔐 Password",
         tab_qrcode: "📷 QR Code", tab_speedtest: "⚡ Speed Test", tab_games: "🕹️ Minigames", tab_submit: "💡 Ideas & Feedback", tab_admin: "🔐 Admin",
-        
         phone_title: "Number Analyzer", phone_label: "Enter Number (e.g. +39XXXXXXXXXX)", phone_btn: "Start Phone Analysis",
         ip_title: "IP & Port Lookup", ip_label: "Enter IP (e.g. 8.8.8.8)", ip_btn: "Scan IP Address",
         myip_title: "Locate your IP & GPS", myip_desc: "Instantly detect your public IP, approximate network location, and high-precision device GPS coordinates.", myip_btn: "Locate My IP Now",
@@ -46,9 +43,8 @@ const translations = {
         speed_title: "Quick Speed Test (Ping)", speed_desc: "Measure your connection's response latency to the server.", speed_btn: "Start Latency Test",
         games_title: "Entertainment & Minigames Area", games_desc: "Select a game to start playing:",
         game_mario: "🍄 Super Mario Retro (50 Levels)", game_lock: "🔓 Unlock Infinite Lock", game_flag: "🌐 Guess the World Flag", game_2048: "🔢 2048 Puzzle", game_tris: "❌ Tic Tac Toe (vs AI & 1vs1) ⭕",
+        game_instructions_btn: "⚙️ How to Play", game_instructions_title: "📖 Game Instructions",
         submit_title: "Send a New Idea or Feedback", submit_type: "Select Type", opt_idea: "💡 Site Idea", opt_feedback: "💬 Feedback / Opinion", submit_msg: "Your message:", submit_placeholder: "Write here...", submit_btn: "Send Message",
-        admin_title: "Restricted Admin Area", admin_label: "Enter Administrator Password", admin_placeholder: "Password...", admin_btn: "Access Admin Area",
-        
         upd_title: "🚀 Update History",
         upd_v4_title: "v4.0.0 Pro (Ultimate Edition) - October 2026",
         upd_v4_1: "Full multilingual support (IT, EN, ES, PT, ZH, AR) with Arabic RTL support.",
@@ -59,7 +55,6 @@ const translations = {
         upd_v3_2: "Advanced Admin panel and Ideas/Feedback submission.",
         upd_v2_title: "v2.0.0 Minigames Suite - September 2026",
         upd_v2_1: "Launch of minigames suite, Speed Test and QR Code.",
-
         rights: "All rights reserved.", license: "License", privacyLink: "Privacy & Cookie Policy", termsLink: "Terms of Service",
         cookieTitle: "🔒 Cookie Consent Required", cookieText: "To use FoundmyIp you must accept technical cookies.", cookieBtn: "Accept & Continue",
         privacyTitle: "Privacy Policy", privacyP1: "1. Data Processing: We log IP addresses for security purposes.", privacyP2: "2. Retention: Stored IPs are automatically deleted after 10 days.",
@@ -68,7 +63,6 @@ const translations = {
     es: {
         tab_phone: "📱 Teléfono", tab_ip: "🌐 Buscar IP", tab_myip: "📍 Mi IP", tab_password: "🔐 Contraseña",
         tab_qrcode: "📷 Código QR", tab_speedtest: "⚡ Pruebas", tab_games: "🕹️ Minijuegos", tab_submit: "💡 Ideas y Feedback", tab_admin: "🔐 Admin",
-        
         phone_title: "Analizador de Números", phone_label: "Ingrese Número (ej. +39XXXXXXXXXX)", phone_btn: "Iniciar Análisis",
         ip_title: "Búsqueda IP y Puertos", ip_label: "Ingrese IP (ej. 8.8.8.8)", ip_btn: "Escanear IP",
         myip_title: "Localiza tu IP y GPS", myip_desc: "Detecta instantáneamente tu IP pública, ubicación aproximada y coordenadas GPS de alta precisión.", myip_btn: "Localizar Mi IP Ahora",
@@ -77,9 +71,8 @@ const translations = {
         speed_title: "Prueba de Velocidad (Ping)", speed_desc: "Mide la latencia de respuesta de tu conexión al servidor.", speed_btn: "Iniciar Prueba de Latencia",
         games_title: "Área de Entretenimiento y Minijuegos", games_desc: "Selecciona un juego para empezar:",
         game_mario: "🍄 Super Mario Retro (50 Niveles)", game_lock: "🔓 Desbloquear Candado Infinito", game_flag: "🌐 Adivina la Bandera del Mundo", game_2048: "🔢 2048 Puzzle", game_tris: "❌ Tres en Raya (vs AI & 1vs1) ⭕",
+        game_instructions_btn: "⚙️ Cómo Jugar", game_instructions_title: "📖 Instrucciones del Juego",
         submit_title: "Envía una Idea o Comentario", submit_type: "Seleccionar Tipo", opt_idea: "💡 Idea para el sitio", opt_feedback: "💬 Comentario / Opinión", submit_msg: "Tu mensaje:", submit_placeholder: "Escribe aquí...", submit_btn: "Enviar Mensaje",
-        admin_title: "Área de Administrador Restringida", admin_label: "Ingrese Contraseña de Administrador", admin_placeholder: "Contraseña...", admin_btn: "Acceder al Área Admin",
-        
         upd_title: "🚀 Historial de Actualizaciones",
         upd_v4_title: "v4.0.0 Pro (Edición Definitiva) - Octubre 2026",
         upd_v4_1: "Soporte multilingüe completo (IT, EN, ES, PT, ZH, AR) con soporte RTL para árabe.",
@@ -90,7 +83,6 @@ const translations = {
         upd_v3_2: "Panel de administración avanzado y envío de ideas.",
         upd_v2_title: "v2.0.0 Suite de Minijuegos - Septiembre 2026",
         upd_v2_1: "Lanzamiento de minijuegos, Speed Test y código QR.",
-
         rights: "Todos los derechos reservados.", license: "Licencia", privacyLink: "Política de Privacidad y Cookies", termsLink: "Términos del Servicio",
         cookieTitle: "🔒 Aceptación de Cookies Requerida", cookieText: "Para usar FoundmyIp debe aceptar las cookies técnicas.", cookieBtn: "Aceptar y Continuar",
         privacyTitle: "Política de Privacidad", privacyP1: "1. Tratamiento de Datos: Registramos IPs por seguridad.", privacyP2: "2. Conservación: Las IPs se eliminan tras 10 días.",
@@ -99,7 +91,6 @@ const translations = {
     pt: {
         tab_phone: "📱 Telefone", tab_ip: "🌐 Pesquisar IP", tab_myip: "📍 Meu IP", tab_password: "🔐 Senha",
         tab_qrcode: "📷 QR Code", tab_speedtest: "⚡ Speed Test", tab_games: "🕹️ Minijogos", tab_submit: "💡 Ideias e Feedback", tab_admin: "🔐 Admin",
-        
         phone_title: "Analisador de Telefones", phone_label: "Digite o Número (ex. +39XXXXXXXXXX)", phone_btn: "Iniciar Análise",
         ip_title: "Busca de IP e Portas", ip_label: "Digite o IP (ex. 8.8.8.8)", ip_btn: "Escanear IP",
         myip_title: "Localize seu IP e GPS", myip_desc: "Detecte instantaneamente seu IP público, localização aproximada e coordenadas GPS de alta precisão.", myip_btn: "Localizar Meu IP Agora",
@@ -108,9 +99,8 @@ const translations = {
         speed_title: "Speed Test Rápido (Ping)", speed_desc: "Mede a latência de resposta da sua conexão com o servidor.", speed_btn: "Iniciar Teste de Latência",
         games_title: "Área de Entretenimento e Minijogos", games_desc: "Selecione um jogo para começar:",
         game_mario: "🍄 Super Mario Retro (50 Níveis)", game_lock: "🔓 Desbloquear Cadeado Infinito", game_flag: "🌐 Adivinhe a Bandeira do Mundo", game_2048: "🔢 2048 Puzzle", game_tris: "❌ Jogo da Velha (vs AI & 1vs1) ⭕",
+        game_instructions_btn: "⚙️ Como Jogar", game_instructions_title: "📖 Instruções do Jogo",
         submit_title: "Envie uma Ideia ou Feedback", submit_type: "Selecionar Tipo", opt_idea: "💡 Ideia para o site", opt_feedback: "💬 Feedback / Opinião", submit_msg: "Sua mensagem:", submit_placeholder: "Escreva aqui...", submit_btn: "Enviar Mensagem",
-        admin_title: "Área de Administrador Restrita", admin_label: "Digite a Senha do Administrador", admin_placeholder: "Senha...", admin_btn: "Acessar Área Admin",
-        
         upd_title: "🚀 Histórico de Atualizações",
         upd_v4_title: "v4.0.0 Pro (Edição Definitiva) - Outubro de 2026",
         upd_v4_1: "Suporte multilíngue completo (IT, EN, ES, PT, ZH, AR) com suporte RTL para árabe.",
@@ -121,7 +111,6 @@ const translations = {
         upd_v3_2: "Painel Admin avançado e envio de ideias.",
         upd_v2_title: "v2.0.0 Suíte de Minijogos - Setembro de 2026",
         upd_v2_1: "Lançamento da suíte de minijogos, Speed Test e QR Code.",
-
         rights: "Todos os direitos reservados.", license: "Licença", privacyLink: "Política de Privacidade e Cookies", termsLink: "Termos de Serviço",
         cookieTitle: "🔒 Consentimento de Cookies Necessário", cookieText: "Para usar o FoundmyIp você deve aceitar os cookies técnicos.", cookieBtn: "Aceitar e Continuar",
         privacyTitle: "Política de Privacidade", privacyP1: "1. Tratamento de Dados: Registramos IPs para segurança.", privacyP2: "2. Retenção: IPs armazenados são excluídos após 10 dias.",
@@ -130,7 +119,6 @@ const translations = {
     zh: {
         tab_phone: "📱 电话", tab_ip: "🌐 IP 查询", tab_myip: "📍 我的 IP", tab_password: "🔐 密码生成",
         tab_qrcode: "📷 二维码", tab_speedtest: "⚡ 测速", tab_games: "🕹️ 小游戏", tab_submit: "💡 建议与反馈", tab_admin: "🔐 管理员",
-        
         phone_title: "号码分析器", phone_label: "输入号码", phone_btn: "开始分析",
         ip_title: "IP 与端口查询", ip_label: "输入 IP", ip_btn: "扫描 IP 地址",
         myip_title: "定位您的 IP 与 GPS", myip_desc: "即时检测您的公网 IP、网络近似位置以及设备高精度 GPS 坐标。", myip_btn: "立即定位我的 IP",
@@ -139,9 +127,8 @@ const translations = {
         speed_title: "快速测速 (Ping)", speed_desc: "测量您的连接到服务器的响应延迟。", speed_btn: "开始延迟测试",
         games_title: "娱乐与小游戏区域", games_desc: "选择一个游戏立即开始：",
         game_mario: "🍄 超级马里奥复古版 (50关)", game_lock: "🔓 解锁无限密码锁", game_flag: "🌐 猜世界国旗", game_2048: "🔢 2048 拼图", game_tris: "❌ 井字棋 (人机 & 1对1) ⭕",
+        game_instructions_btn: "⚙️ 游戏说明", game_instructions_title: "📖 游戏指南",
         submit_title: "发送新想法或反馈", submit_type: "选择类型", opt_idea: "💡 网站建议", opt_feedback: "💬 反馈 / 意见", submit_msg: "您的留言：", submit_placeholder: "在此输入...", submit_btn: "发送消息",
-        admin_title: "管理员受限区域", admin_label: "输入管理员密码", admin_placeholder: "密码...", admin_btn: "访问管理区",
-        
         upd_title: "🚀 更新历史",
         upd_v4_title: "v4.0.0 Pro (终极版) - 2026年10月",
         upd_v4_1: "全面支持多语言（IT, EN, ES, PT, ZH, AR），阿拉伯语支持 RTL。",
@@ -152,7 +139,6 @@ const translations = {
         upd_v3_2: "高级管理员面板与意见反馈提交。",
         upd_v2_title: "v2.0.0 小游戏套件 - 2026年9月",
         upd_v2_1: "推出小游戏套件、测速工具和二维码生成器。",
-
         rights: "保留所有权利。", license: "许可证", privacyLink: "隐私与 Cookie 政策", termsLink: "服务条款",
         cookieTitle: "🔒 需要 Cookie 授权", cookieText: "使用 FoundmyIp 必须接受技术 Cookie。", cookieBtn: "接受并继续",
         privacyTitle: "隐私政策", privacyP1: "1. 数据处理：出于安全目的记录 IP 地址。", privacyP2: "2. 保留期限：保存的 IP 将在 10 天后自动删除。",
@@ -161,7 +147,6 @@ const translations = {
     ar: {
         tab_phone: "📱 الهاتف", tab_ip: "🌐 فحص IP", tab_myip: "📍 عنوان IP الخاص بي", tab_password: "🔐 كلمة المرور",
         tab_qrcode: "📷 رمز QR", tab_speedtest: "⚡ اختبار السرعة", tab_games: "🕹️ ألعاب صغيرة", tab_submit: "💡 الأفكار والملاحظات", tab_admin: "🔐 الإدارة",
-        
         phone_title: "محلل الأرقام", phone_label: "أدخل الرقم", phone_btn: "بدء تحليل الهاتف",
         ip_title: "فحص IP والمنفذ", ip_label: "أدخل IP", ip_btn: "فحص عنوان IP",
         myip_title: "حدد موقع IP و GPS الخاص بك", myip_desc: "الكشف فوراً عن عنوان IP العام الخاص بك، والموقع التقريبي، وإحداثيات GPS عالية الدقة.", myip_btn: "حدد موقع IP الخاص بي الآن",
@@ -170,9 +155,8 @@ const translations = {
         speed_title: "اختبار السرعة السريع (Ping)", speed_desc: "قياس زمن الانتقال لشبكتك إلى الخادم.", speed_btn: "بدء اختبار التأخير",
         games_title: "منطقة الترفيه والألعاب الصغيرة", games_desc: "اختر لعبة للبدء فوراً:",
         game_mario: "🍄 ماريو الكلاسيكية (50 مستوى)", game_lock: "🔓 فتح القفل اللانهائي", game_flag: "🌐 تخمين علم العالم", game_2048: "🔢 لغز 2048", game_tris: "❌ إكس أوه (ضد الذكاء الاصطناعي و 1 ضد 1) ⭕",
+        game_instructions_btn: "⚙️ طريقة اللعب", game_instructions_title: "📖 تعليمات اللعبة",
         submit_title: "إرسال فكرة جديدة أو ملاحظة", submit_type: "حدد النوع", opt_idea: "💡 فكرة للموقع", opt_feedback: "💬 ملاحظة / رأي", submit_msg: "رسالتك:", submit_placeholder: "اكتب هنا...", submit_btn: "إرسال الرسالة",
-        admin_title: "منطقة المسؤول المقيدة", admin_label: "أدخل كلمة مرور المسؤول", admin_placeholder: "كلمة المرور...", admin_btn: "الدخول إلى لوحة التحكم",
-        
         upd_title: "🚀 سجل التحديثات",
         upd_v4_title: "v4.0.0 Pro (الإصدار النهائي) - أكتوبر 2026",
         upd_v4_1: "دعم كامل للغات المتعددة مع دعم RTL للغة العربية.",
@@ -183,7 +167,6 @@ const translations = {
         upd_v3_2: "لوحة تحكم متقدمة وإرسال المقترحات.",
         upd_v2_title: "v2.0.0 مجموعة الألعاب - سبتمبر 2026",
         upd_v2_1: "إطلاق الألعاب واختبار السرعة ومولد رمز QR.",
-
         rights: "جميع الحقوق محفوظة.", license: "الترخيص", privacyLink: "سياسة الخصوصية وملفات تعريف الارتباط", termsLink: "شروط الخدمة",
         cookieTitle: "🔒 موافقة ملفات تعريف الارتباط مطلوبة", cookieText: "لاستخدام FoundmyIp ، يجب عليك قبول ملفات تعريف الارتباط الفنية.", cookieBtn: "قبول والمتابعة",
         privacyTitle: "سياسة الخصوصية", privacyP1: "1. معالجة البيانات: نسجل عناوين IP لأغراض الأمان.", privacyP2: "2. الاحتفاظ: يتم حذف عناوين IP المخزنة تلقائيًا بعد 10 أيام.",
