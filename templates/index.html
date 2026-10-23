@@ -22,20 +22,18 @@
 {% include 'components/games_list.html' %}
 
 <div id="submit-card" class="card {% if active_tab == 'submit' %}active{% endif %}">
-    <h3>💡 Invia una Nuova Idea o un Feedback</h3>
+    <h3 data-i18n="submit_title">💡 Invia una Nuova Idea o un Feedback</h3>
     <form method="POST" action="/submit_idea">
-        <label>Seleziona Tipo</label>
+        <label data-i18n="submit_type">Seleziona Tipo</label>
         <select name="tipo">
-            <option value="idea">💡 Idea per il sito</option>
-            <option value="feedback">💬 Feedback / Parere</option>
+            <option value="idea" data-i18n="opt_idea">💡 Idea per il sito</option>
+            <option value="feedback" data-i18n="opt_feedback">💬 Feedback / Parere</option>
         </select>
-        <label>Il tuo messaggio:</label>
-        <textarea name="messaggio" rows="4" placeholder="Scrivi qui..." style="width: 100%; padding: 12px; margin: 8px 0 16px 0; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px;" required></textarea>
-        <button type="submit" class="action-btn">Invia Messaggio</button>
+        <label data-i18n="submit_msg">Il tuo messaggio:</label>
+        <textarea name="messaggio" rows="4" placeholder="Scrivi qui..." style="width: 100%; padding: 12px; margin: 8px 0 16px 0; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px;" data-i18n-placeholder="submit_placeholder" required></textarea>
+        <button type="submit" class="action-btn" data-i18n="submit_btn">Invia Messaggio</button>
     </form>
-    <div class="card-version-footer">
-        <span>FoundmyIp <strong>v4.0.0 Pro</strong></span>
-    </div>
+    {% include 'components/updates_block.html' %}
 </div>
 
 {% include 'components/admin.html' %}
