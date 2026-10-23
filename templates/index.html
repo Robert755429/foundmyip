@@ -10,7 +10,6 @@
     <button class="tab-btn {% if active_tab == 'speedtest' %}active{% endif %}" onclick="switchTab('speedtest')">⚡ Speed Test</button>
     <button class="tab-btn {% if active_tab == 'games' %}active{% endif %}" onclick="switchTab('games')">🕹️ Minigiochi</button>
     <button class="tab-btn {% if active_tab == 'submit' %}active{% endif %}" onclick="switchTab('submit')">💡 Idee & Feedback</button>
-    <button class="tab-btn {% if active_tab == 'updates' %}active{% endif %}" onclick="switchTab('updates')">🚀 Aggiornamenti</button>
     <button class="tab-btn {% if active_tab == 'admin' %}active{% endif %}" onclick="switchTab('admin')">🔐 Admin</button>
 </div>
 
@@ -34,9 +33,11 @@
         <textarea name="messaggio" rows="4" placeholder="Scrivi qui..." style="width: 100%; padding: 12px; margin: 8px 0 16px 0; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px;" required></textarea>
         <button type="submit" class="action-btn">Invia Messaggio</button>
     </form>
+    <div style="margin-top: 20px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 10px;">
+        <span style="font-size: 0.75rem; color: #94a3b8;">FoundmyIp <strong>v4.0.0 Pro</strong></span>
+    </div>
 </div>
 
-{% include 'components/updates.html' %}
 {% include 'components/admin.html' %}
 
 {% if result %}
