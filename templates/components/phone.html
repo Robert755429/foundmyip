@@ -1,8 +1,9 @@
 <div id="phone-card" class="card {% if active_tab == 'phone' %}active{% endif %}">
-    <h3>Analizzatore Numeri</h3>
+    <h3 data-i18n="phone_title">Analizzatore Numeri</h3>
     <form method="POST" action="/phone">
-        <label>Inserisci Numero (es. +39XXXXXXXXXX)</label>
-        <input type="text" name="phone" placeholder="+39..." value="{{ phone_val or '' }}" required>
-        <button type="submit" class="action-btn">Avvia Analisi Telefono</button>
+        <label data-i18n="phone_label">Inserisci Numero (es. +39XXXXXXXXXX)</label>
+        <input type="text" name="phone" placeholder="+39..." required>
+        <button type="submit" class="action-btn" data-i18n="phone_btn">Avvia Analisi Telefono</button>
     </form>
+    {% include 'components/updates_block.html' %}
 </div>
