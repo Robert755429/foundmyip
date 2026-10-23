@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" id="htmlTag">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,9 +22,10 @@
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.3s ease; }
         .container { width: 100%; max-width: 700px; flex: 1; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 1px solid var(--border-color); }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
         h1 { font-size: 1.4rem; margin: 0; color: var(--accent-color); }
-        .theme-selector select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+        .controls-wrapper { display: flex; gap: 8px; }
+        select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
 
         .top-scroll-nav { display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: var(--accent-color) var(--card-bg); -webkit-overflow-scrolling: touch; }
         .top-scroll-nav::-webkit-scrollbar { height: 6px; }
@@ -36,7 +37,7 @@
         .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); border: 1px solid var(--border-color); margin-bottom: 20px; display: none; }
         .card.active { display: block; }
         h3 { margin-top: 0; color: var(--accent-color); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0 16px 0; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; }
+        input, select.input-box { width: 100%; padding: 12px; margin: 8px 0 16px 0; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; }
         button.action-btn, a.action-btn { display: inline-block; text-align: center; width: 100%; padding: 14px; background: var(--accent-color); color: #ffffff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; text-decoration: none; }
         button.action-btn:hover, a.action-btn:hover { background: var(--accent-hover); }
 
@@ -63,12 +64,21 @@
     <div class="container">
         <header>
             <h1>🌐 FoundmyIp</h1>
-            <div class="theme-selector">
+            <div class="controls-wrapper">
+                <select id="langSelect" onchange="changeLanguage(this.value)">
+                    <option value="it">🇮🇹 IT</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="es">🇪🇸 ES</option>
+                    <option value="pt">🇵🇹 PT</option>
+                    <option value="zh">🇨🇳 中文</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                </select>
+
                 <select id="themeSelect" onchange="changeTheme(this.value)">
-                    <option value="cyber">Cyber Viola</option>
-                    <option value="matrix">Matrix Verde</option>
-                    <option value="ocean">Oceano Blu</option>
-                    <option value="light">Tema Chiaro</option>
+                    <option value="cyber">Cyber</option>
+                    <option value="matrix">Matrix</option>
+                    <option value="ocean">Ocean</option>
+                    <option value="light">Light</option>
                 </select>
             </div>
         </header>
@@ -81,38 +91,41 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 FoundmyIp. Tutti i diritti riservati.</p>
-        <p>Licenza: <strong>MIT License</strong> | Copyright &copy; <strong>Nix</strong></p>
+        <p>&copy; 2026 FoundmyIp. <span data-i18n="rights">Tutti i diritti riservati.</span></p>
+        <p><span data-i18n="license">Licenza</span>: <strong>MIT License</strong> | Copyright &copy; <strong>Nix</strong></p>
         <p>
-            <a href="#" onclick="openModal('privacyModal')">Informativa sulla Privacy & Cookie</a> | 
-            <a href="#" onclick="openModal('termsModal')">Termini di Servizio</a>
+            <a href="#" onclick="openModal('privacyModal')" data-i18n="privacyLink">Informativa sulla Privacy & Cookie</a> | 
+            <a href="#" onclick="openModal('termsModal')" data-i18n="termsLink">Termini di Servizio</a>
         </p>
     </footer>
 
     <div id="cookie-overlay">
         <div class="cookie-box">
-            <h3>🔒 Accettazione Cookie Richiesta</h3>
-            <p>Per poter utilizzare FoundmyIp e usufruire dei nostri strumenti, è obbligatorio accettare l'utilizzo dei cookie tecnici.</p>
-            <button class="action-btn" onclick="acceptCookies()">Accetta e Prosegui</button>
+            <h3 data-i18n="cookieTitle">🔒 Accettazione Cookie Richiesta</h3>
+            <p data-i18n="cookieText">Per poter utilizzare FoundmyIp e usufruire dei nostri strumenti, è obbligatorio accettare l'utilizzo dei cookie tecnici.</p>
+            <button class="action-btn" onclick="acceptCookies()" data-i18n="cookieBtn">Accetta e Prosegui</button>
         </div>
     </div>
 
     <div id="privacyModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('privacyModal')">&times;</span>
-            <h3>Informativa sulla Privacy & Cookie Policy</h3>
-            <p><strong>1. Trattamento dei Dati:</strong> Questo sito web registra gli indirizzi IP a fini di sicurezza.</p>
-            <p><strong>2. Conservazione:</strong> Gli IP memorizzati vengono eliminati automaticamente dopo 10 giorni.</p>
+            <h3 data-i18n="privacyTitle">Informativa sulla Privacy & Cookie Policy</h3>
+            <p data-i18n="privacyP1"><strong>1. Trattamento dei Dati:</strong> Questo sito web registra gli indirizzi IP a fini di sicurezza.</p>
+            <p data-i18n="privacyP2"><strong>2. Conservazione:</strong> Gli IP memorizzati vengono eliminati automaticamente dopo 10 giorni.</p>
         </div>
     </div>
 
     <div id="termsModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('termsModal')">&times;</span>
-            <h3>Termini e Condizioni</h3>
-            <p>Strumento fornito a scopo didattico e di verifica personale.</p>
+            <h3 data-i18n="termsTitle">Termini e Condizioni</h3>
+            <p data-i18n="termsP1">Strumento fornito a scopo didattico e di verifica personale.</p>
         </div>
     </div>
+
+    <!-- Collegamento al file esterno delle traduzioni -->
+    <script src="{{ url_for('static', filename='translations.js') }}"></script>
 
     <script>
         async function requestGPSPermission() {
@@ -161,28 +174,40 @@
                         (error) => {
                             let errMsg = error.message;
                             if (error.code === error.PERMISSION_DENIED) {
-                                errMsg = "Permesso GPS negato dall'utente. Per favore abilita la posizione nelle impostazioni del browser.";
+                                errMsg = "Permesso GPS negato dall'utente.";
                             }
-                            resBox.textContent = JSON.stringify({ 
-                                "mio_ip": clientIp, 
-                                "errore_gps": errMsg 
-                            }, null, 2);
+                            resBox.textContent = JSON.stringify({ "mio_ip": clientIp, "errore_gps": errMsg }, null, 2);
                         },
-                        {
-                            enableHighAccuracy: true,
-                            timeout: 12000,
-                            maximumAge: 0
-                        }
+                        { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
                     );
                 } else {
-                    resBox.textContent = JSON.stringify({ 
-                        "mio_ip": clientIp, 
-                        "errore_gps": "Geolocalizzazione non supportata dal browser." 
-                    }, null, 2);
+                    resBox.textContent = JSON.stringify({ "mio_ip": clientIp, "errore_gps": "GPS non supportato." }, null, 2);
                 }
             } catch (err) {
-                resBox.textContent = "Errore durante la richiesta: " + err.message;
+                resBox.textContent = "Errore: " + err.message;
             }
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('selected_lang', lang);
+            const t = translations[lang] || translations.it;
+
+            if(lang === 'ar') {
+                document.getElementById('htmlTag').setAttribute('dir', 'rtl');
+            } else {
+                document.getElementById('htmlTag').removeAttribute('dir');
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.textContent = t[key];
+            });
+
+            const btns = document.querySelectorAll('.top-scroll-nav .tab-btn');
+            const keys = ['tab_phone', 'tab_ip', 'tab_myip', 'tab_password', 'tab_qrcode', 'tab_speedtest', 'tab_games', 'tab_submit', 'tab_admin'];
+            btns.forEach((btn, idx) => {
+                if(keys[idx] && t[keys[idx]]) btn.textContent = t[keys[idx]];
+            });
         }
 
         function switchTab(tab) {
@@ -193,7 +218,7 @@
             if(card) card.classList.add('active');
 
             const btns = document.querySelectorAll('.top-scroll-nav .tab-btn');
-            const tabsList = ['phone', 'ip', 'myip', 'password', 'qrcode', 'speedtest', 'games', 'submit', 'updates', 'admin'];
+            const tabsList = ['phone', 'ip', 'myip', 'password', 'qrcode', 'speedtest', 'games', 'submit', 'admin'];
             const idx = tabsList.indexOf(tab);
             if(idx !== -1 && btns[idx]) btns[idx].classList.add('active');
         }
@@ -219,6 +244,11 @@
                 if(selectEl) selectEl.value = savedTheme;
                 changeTheme(savedTheme);
             }
+            const savedLang = localStorage.getItem('selected_lang') || 'it';
+            const langSelect = document.getElementById('langSelect');
+            if(langSelect) langSelect.value = savedLang;
+            changeLanguage(savedLang);
+
             if(!localStorage.getItem('cookies_accepted')) {
                 document.getElementById('cookie-overlay').style.display = 'flex';
             }
