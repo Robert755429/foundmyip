@@ -1,55 +1,25 @@
 <div id="updates-block" style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px; position: relative;">
-    
-    <button type="button" onclick="dismissUpdatesBlock()" title="Chiudi aggiornamenti" style="position: absolute; top: 12px; right: 0; background: transparent; border: none; color: #94a3b8; font-size: 1.1rem; font-weight: bold; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: color 0.2s, background 0.2s;" onmouseover="this.style.color='#f8fafc'; this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.color='#94a3b8'; this.style.background='transparent';">
-        ✕
-    </button>
-
-    <h4 style="margin: 0 0 10px 0; color: var(--accent-color); font-size: 0.9rem; padding-right: 25px;" data-i18n="upd_title">🚀 Storico Aggiornamenti</h4>
-    
-    <div style="max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); text-align: left; scrollbar-width: thin; scrollbar-color: var(--accent-color) var(--card-bg);">
-        
+    <button type="button" onclick="dismissUpdatesBlock()" style="position: absolute; top: 12px; right: 0; background: transparent; border: none; color: #94a3b8; font-size: 1.1rem; font-weight: bold; cursor: pointer; padding: 4px 8px;">✕</button>
+    <h4 style="margin: 0 0 10px 0; color: var(--accent-color); font-size: 0.9rem;">🚀 Storico Aggiornamenti</h4>
+    <div style="max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); text-align: left;">
         <div style="margin-bottom: 10px; border-left: 3px solid var(--accent-color); padding-left: 8px;">
-            <strong style="font-size: 0.8rem; color: var(--accent-color);" data-i18n="upd_v4_title">v4.0.0 Pro (Ultimate Edition) - Ottobre 2026</strong>
+            <strong style="font-size: 0.8rem; color: var(--accent-color);">v4.0.0 Pro (Ultimate Edition) - Ottobre 2026</strong>
             <ul style="margin: 3px 0 0 0; padding-left: 15px; font-size: 0.75rem; color: #cbd5e1; line-height: 1.3;">
-                <li data-i18n="upd_v4_1">Multilingua completo (IT, EN, ES, PT, ZH, AR) con supporto RTL per l'arabo.</li>
-                <li data-i18n="upd_v4_2">Dataset completo di tutti i 195 Paesi per il gioco delle bandiere.</li>
-                <li data-i18n="upd_v4_3">Istruzioni (⚙️) su tutti i minigiochi e fix 2048.</li>
+                <li>Integrazione WAF Firewall avanzato con Auto-Ban.</li>
+                <li>Modulo Antivirus & Malware Scanner integrato.</li>
+                <li>Traduzione multilingua automatica in tempo reale.</li>
             </ul>
         </div>
-
-        <div style="margin-bottom: 10px; border-left: 3px solid #10b981; padding-left: 8px;">
-            <strong style="font-size: 0.8rem; color: #10b981;" data-i18n="upd_v3_title">v3.5.0 GPS & Admin - Ottobre 2026</strong>
-            <ul style="margin: 3px 0 0 0; padding-left: 15px; font-size: 0.75rem; color: #cbd5e1; line-height: 1.3;">
-                <li data-i18n="upd_v3_1">Geolocalizzazione GPS ad alta precisione.</li>
-                <li data-i18n="upd_v3_2">Pannello Admin avanzato e invio Idee/Feedback.</li>
-            </ul>
-        </div>
-
-        <div style="border-left: 3px solid #0284c7; padding-left: 8px;">
-            <strong style="font-size: 0.8rem; color: #0284c7;" data-i18n="upd_v2_title">v2.0.0 Suite Minigiochi - Settembre 2026</strong>
-            <ul style="margin: 3px 0 0 0; padding-left: 15px; font-size: 0.75rem; color: #cbd5e1; line-height: 1.3;">
-                <li data-i18n="upd_v2_1">Lancio suite minigiochi, Speed Test e QR Code.</li>
-            </ul>
-        </div>
-
-    </div>
-
-    <div style="margin-top: 10px; text-align: center;">
-        <span style="font-size: 0.75rem; color: #94a3b8;">FoundmyIp <strong>v4.0.0 Pro</strong></span>
     </div>
 </div>
-
 <script>
 function dismissUpdatesBlock() {
-    const blocks = document.querySelectorAll('#updates-block');
-    blocks.forEach(b => b.style.display = 'none');
+    document.querySelectorAll('#updates-block').forEach(b => b.style.display = 'none');
     localStorage.setItem('updates_dismissed', 'true');
 }
-
 if (localStorage.getItem('updates_dismissed') === 'true') {
     document.addEventListener("DOMContentLoaded", function() {
-        const blocks = document.querySelectorAll('#updates-block');
-        blocks.forEach(b => b.style.display = 'none');
+        document.querySelectorAll('#updates-block').forEach(b => b.style.display = 'none');
     });
 }
 </script>
