@@ -3,60 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoundmyIp</title>
+    <title>FoundmyIp v4.0.0 Pro</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-color: #8b5cf6;
-            --accent-hover: #7c3aed;
-            --input-bg: #090d16;
-            --border-color: #334155;
+            --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f8fafc;
+            --accent-color: #8b5cf6; --accent-hover: #7c3aed; --input-bg: #090d16; --border-color: #334155;
         }
-
         body.theme-matrix { --bg-color: #022c22; --card-bg: #064e3b; --accent-color: #10b981; --accent-hover: #059669; }
         body.theme-ocean { --bg-color: #082f49; --card-bg: #0369a1; --accent-color: #38bdf8; --accent-hover: #0ea5e9; }
         body.theme-light { --bg-color: #f1f5f9; --card-bg: #ffffff; --text-color: #0f172a; --accent-color: #6366f1; --accent-hover: #4f46e5; --input-bg: #f8fafc; --border-color: #cbd5e1; }
-
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.3s ease; }
         .container { width: 100%; max-width: 700px; flex: 1; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 12px 18px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
         h1 { font-size: 1.3rem; margin: 0; color: var(--accent-color); font-weight: 800; display: flex; align-items: center; gap: 6px; }
-        
         .header-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-        .control-select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 600; outline: none; transition: border-color 0.2s; }
-        .control-select:focus, .control-select:hover { border-color: var(--accent-color); }
-
-        .top-scroll-nav { display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: var(--accent-color) var(--card-bg); -webkit-overflow-scrolling: touch; }
+        .control-select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 600; outline: none; }
+        .top-scroll-nav { display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: var(--accent-color) var(--card-bg); }
         .top-scroll-nav::-webkit-scrollbar { height: 6px; }
-        .top-scroll-nav::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
-        .top-scroll-nav .tab-btn { flex: 0 0 auto; min-width: 110px; }
-        .tab-btn { padding: 12px; text-align: center; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); font-weight: bold; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-decoration: none; font-size: 0.85rem; }
-        .tab-btn.active { background: var(--accent-color); color: #ffffff; border-color: var(--accent-color); }
-
+        .tab-btn { padding: 12px; text-align: center; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); font-weight: bold; border-radius: 10px; cursor: pointer; text-decoration: none; font-size: 0.85rem; flex: 0 0 auto; min-width: 100px; }
+        .tab-btn.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
         .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); border: 1px solid var(--border-color); margin-bottom: 20px; display: none; }
         .card.active { display: block; }
         h3 { margin-top: 0; color: var(--accent-color); }
         input, select.input-box { width: 100%; padding: 12px; margin: 8px 0 16px 0; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; }
-        button.action-btn, a.action-btn { display: inline-block; text-align: center; width: 100%; padding: 14px; background: var(--accent-color); color: #ffffff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; text-decoration: none; }
+        button.action-btn, a.action-btn { display: inline-block; text-align: center; width: 100%; padding: 14px; background: var(--accent-color); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; text-decoration: none; }
         button.action-btn:hover, a.action-btn:hover { background: var(--accent-hover); }
-
-        .games-vertical-container { display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; padding-right: 5px; margin-top: 10px; scrollbar-width: thin; scrollbar-color: var(--accent-color) var(--card-bg); }
-        .games-vertical-container::-webkit-scrollbar { width: 6px; }
-        .games-vertical-container::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
-        .game-link { display: flex; align-items: center; justify-content: center; padding: 15px; border-radius: 10px; color: #ffffff; font-weight: bold; text-decoration: none; font-size: 0.95rem; transition: transform 0.15s, opacity 0.15s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .game-link:hover { transform: translateY(-2px); opacity: 0.95; }
-
         pre { background: #020617; color: #38bdf8; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.9rem; border: 1px solid var(--border-color); }
-        .alert-error { background: #7f1d1d; color: #fca5a5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #991b1b; }
+        .alert-error { background: #7f1d1d; color: #fca5a5; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
         #cookie-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
         .cookie-box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 12px; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-
         footer { margin-top: auto; width: 100%; max-width: 700px; text-align: center; padding: 20px 0 10px 0; font-size: 0.8rem; color: #94a3b8; border-top: 1px solid var(--border-color); }
         footer a { color: var(--accent-color); text-decoration: none; margin: 0 5px; }
-        footer a:hover { text-decoration: underline; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 500px; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border-color); }
         .modal-close { float: right; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
@@ -67,197 +45,50 @@
         <header>
             <h1>🌐 FoundmyIp</h1>
             <div class="header-controls">
-                <select id="langSelect" class="control-select" onchange="changeLanguage(this.value)">
-                    <option value="it">🇮🇹 IT</option>
-                    <option value="en">🇬🇧 EN</option>
-                    <option value="es">🇪🇸 ES</option>
-                    <option value="pt">🇵🇹 PT</option>
-                    <option value="zh">🇨🇳 中文</option>
-                    <option value="ar">🇸🇦 العربية</option>
-                </select>
+                <!-- Widget di Google Translate integrato -->
+                <div id="google_translate_element"></div>
 
                 <select id="themeSelect" class="control-select" onchange="changeTheme(this.value)">
-                    <option value="cyber">🎨 Cyber</option>
-                    <option value="matrix">Matrix</option>
-                    <option value="ocean">Ocean</option>
-                    <option value="light">Light</option>
+                    <option value="cyber">🎨 Cyber</option><option value="matrix">Matrix</option>
+                    <option value="ocean">Ocean</option><option value="light">Light</option>
                 </select>
             </div>
         </header>
-
-        {% if error %}
-            <div class="alert-error">{{ error }}</div>
-        {% endif %}
-
+        {% if error %}<div class="alert-error">{{ error }}</div>{% endif %}
         {% block content %}{% endblock %}
     </div>
-
     <footer>
-        <p>&copy; 2026 FoundmyIp. <span data-i18n="rights">Tutti i diritti riservati.</span></p>
-        <p><span data-i18n="license">Licenza</span>: <strong>MIT License</strong> | Copyright &copy; <strong>Nix</strong></p>
-        <p>
-            <a href="#" onclick="openModal('privacyModal')" data-i18n="privacyLink">Informativa sulla Privacy & Cookie</a> | 
-            <a href="#" onclick="openModal('termsModal')" data-i18n="termsLink">Termini di Servizio</a>
-        </p>
+        <p>&copy; 2026 FoundmyIp. Tutti i diritti riservati.</p>
+        <p>Licenza: <strong>MIT License</strong> | Copyright &copy; <strong>Nix</strong></p>
     </footer>
 
     <div id="cookie-overlay">
         <div class="cookie-box">
-            <h3 data-i18n="cookieTitle">🔒 Accettazione Cookie Richiesta</h3>
-            <p data-i18n="cookieText">Per poter utilizzare FoundmyIp e usufruire dei nostri strumenti, è obbligatorio accettare l'utilizzo dei cookie tecnici.</p>
-            <button class="action-btn" onclick="acceptCookies()" data-i18n="cookieBtn">Accetta e Prosegui</button>
+            <h3>🔒 Accettazione Cookie Richiesta</h3>
+            <p>Per poter utilizzare FoundmyIp è necessario accettare i cookie tecnici.</p>
+            <button class="action-btn" onclick="acceptCookies()">Accetta e Prosegui</button>
         </div>
     </div>
 
-    <div id="privacyModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('privacyModal')">&times;</span>
-            <h3 data-i18n="privacyTitle">Informativa sulla Privacy & Cookie Policy</h3>
-            <p data-i18n="privacyP1"><strong>1. Trattamento dei Dati:</strong> Questo sito web registra gli indirizzi IP a fini di sicurezza.</p>
-            <p data-i18n="privacyP2"><strong>2. Conservazione:</strong> Gli IP memorizzati vengono eliminati automaticamente dopo 10 giorni.</p>
-        </div>
-    </div>
-
-    <div id="termsModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('termsModal')">&times;</span>
-            <h3 data-i18n="termsTitle">Termini e Condizioni</h3>
-            <p data-i18n="termsP1">Strumento fornito a scopo didattico e di verifica personale.</p>
-        </div>
-    </div>
+    <!-- Script Google Translate -->
+    <script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'it',
+            includedLanguages: 'it,en,es,pt,zh-CN,ar',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <script src="{{ url_for('static', filename='translations.js') }}"></script>
-
     <script>
-        async function requestGPSPermission() {
-            const resBox = document.getElementById('myip-result');
-            resBox.style.display = 'block';
-            resBox.textContent = "⌛ Richiesta autorizzazione GPS in corso...";
-
-            try {
-                const ipResponse = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipResponse.json();
-                const clientIp = ipData.ip;
-
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        async (position) => {
-                            const lat = position.coords.latitude;
-                            const lon = position.coords.longitude;
-                            const acc = Math.round(position.coords.accuracy);
-
-                            let localita = "Sconosciuta";
-                            try {
-                                const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-                                const geoData = await geoRes.json();
-                                if (geoData && geoData.address) {
-                                    const town = geoData.address.town || geoData.address.city || geoData.address.village || "";
-                                    const county = geoData.address.county || geoData.address.state || "";
-                                    localita = `${town} (${county})`.trim();
-                                }
-                            } catch (e) { 
-                                localita = "Posizione GPS Rilevata"; 
-                            }
-
-                            const output = {
-                                "mio_ip": clientIp,
-                                "timestamp": new Date().toISOString(),
-                                "localita_reale": localita,
-                                "latitudine": lat,
-                                "longitudine": lon,
-                                "precisione_metri": acc,
-                                "link_google_maps": `https://www.google.com/maps?q=${lat},${lon}`,
-                                "nota": "IP corretto unito alla posizione GPS ad alta precisione"
-                            };
-
-                            resBox.textContent = JSON.stringify(output, null, 2);
-                        },
-                        (error) => {
-                            let errMsg = error.message;
-                            if (error.code === error.PERMISSION_DENIED) {
-                                errMsg = "Permesso GPS negato dall'utente.";
-                            }
-                            resBox.textContent = JSON.stringify({ "mio_ip": clientIp, "errore_gps": errMsg }, null, 2);
-                        },
-                        { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
-                    );
-                } else {
-                    resBox.textContent = JSON.stringify({ "mio_ip": clientIp, "errore_gps": "GPS non supportato." }, null, 2);
-                }
-            } catch (err) {
-                resBox.textContent = "Errore: " + err.message;
-            }
-        }
-
-        function changeLanguage(lang) {
-            localStorage.setItem('selected_lang', lang);
-            const t = translations[lang] || translations.it;
-
-            if(lang === 'ar') {
-                document.getElementById('htmlTag').setAttribute('dir', 'rtl');
-            } else {
-                document.getElementById('htmlTag').removeAttribute('dir');
-            }
-
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if(t[key]) el.textContent = t[key];
-            });
-
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-i18n-placeholder');
-                if(t[key]) el.placeholder = t[key];
-            });
-
-            const btns = document.querySelectorAll('.top-scroll-nav .tab-btn');
-            const keys = ['tab_phone', 'tab_ip', 'tab_myip', 'tab_password', 'tab_qrcode', 'tab_speedtest', 'tab_games', 'tab_submit', 'tab_admin'];
-            btns.forEach((btn, idx) => {
-                if(keys[idx] && t[keys[idx]]) btn.textContent = t[keys[idx]];
-            });
-        }
-
         function switchTab(tab) {
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.top-scroll-nav .tab-btn').forEach(b => b.classList.remove('active'));
-
             const card = document.getElementById(tab + '-card');
             if(card) card.classList.add('active');
-
-            const btns = document.querySelectorAll('.top-scroll-nav .tab-btn');
-            const tabsList = ['phone', 'ip', 'myip', 'password', 'qrcode', 'speedtest', 'games', 'submit', 'admin'];
-            const idx = tabsList.indexOf(tab);
-            if(idx !== -1 && btns[idx]) btns[idx].classList.add('active');
-        }
-
-        function changeTheme(theme) {
-            document.body.className = '';
-            if(theme && theme !== 'cyber') document.body.classList.add('theme-' + theme);
-            localStorage.setItem('selected_theme', theme);
-        }
-
-        function acceptCookies() {
-            localStorage.setItem('cookies_accepted', 'true');
-            document.getElementById('cookie-overlay').style.display = 'none';
-        }
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('selected_theme');
-            if(savedTheme) {
-                const selectEl = document.getElementById('themeSelect');
-                if(selectEl) selectEl.value = savedTheme;
-                changeTheme(savedTheme);
-            }
-            const savedLang = localStorage.getItem('selected_lang') || 'it';
-            const langSelect = document.getElementById('langSelect');
-            if(langSelect) langSelect.value = savedLang;
-            changeLanguage(savedLang);
-
-            if(!localStorage.getItem('cookies_accepted')) {
-                document.getElementById('cookie-overlay').style.display = 'flex';
-            }
         }
     </script>
 </body>
