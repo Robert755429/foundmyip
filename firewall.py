@@ -1,12 +1,13 @@
 import re
 import time
 from collections import defaultdict
+from urllib.parse import unquote
 from flask import request, abort
 
 WHITELIST_IPS = set(["127.0.0.1"])
 STATIC_BLACKLIST_IPS = set()
 
-MAX_REQUESTS_PER_WINDOW = 40
+MAX_REQUESTS_PER_WINDOW = 50
 RATE_LIMIT_WINDOW = 60
 MAX_VIOLATIONS_BEFORE_BAN = 3
 BAN_DURATION_SECONDS = 3600
@@ -16,7 +17,7 @@ ip_violations = defaultdict(int)
 banned_ips = {}
 
 MALICIOUS_USER_AGENTS = [
-    r"(?i)(sqlmap|nikto|nmap|masscan|dirbuster|gobuster|wpscan|hydra|burp|zaproxy|acunetix|havij|netsparker|openvas|nessus)"
+    r"(?i)(sqlmap|nikto|nmap|masscan|dirbuster|gobuster|wpscan|hydra|burp|zaproxy|acunetix|havij|netsparker|openvas|nessus|arachni|skipfish)"
 ]
 
 ATTACK_PATTERNS = [
@@ -36,17 +37,27 @@ def get_client_ip():
         return request.headers.get('X-Forwarded-For').split(',')[0].strip()
     return request.remote_addr or "0.0.0.0"
 
+def normalize_payload(data):
+    if not data:
+        return ""
+    decoded = str(data)
+    for _ in range(3):
+        prev = decoded
+        decoded = unquote(decoded)
+        if decoded == prev:
+            break
+    return decoded.replace('\0', '').replace('\x00', '')
+
 def is_payload_malicious(text):
-    if not text:
-        return False
+    normalized = normalize_payload(text)
     for pattern in ATTACK_PATTERNS:
-        if re.search(pattern, str(text)):
+        if re.search(pattern, normalized):
             return True
     return False
 
 def is_user_agent_blocked(ua):
     if not ua:
-        return False
+        return True
     for pattern in MALICIOUS_USER_AGENTS:
         if re.search(pattern, ua):
             return True
@@ -64,7 +75,7 @@ def check_ban_status(ip):
 
 def trigger_ban(ip):
     banned_ips[ip] = time.time() + BAN_DURATION_SECONDS
-    print(f"🚨 [FIREWALL JAIL] IP {ip} BANNATO PER 1 ORA.")
+    print(f"🚨 [FIREWALL JAIL] IP {ip} BANNATO AUTOMATICAMENTE PER 1 ORA.")
 
 def check_rate_limit(client_ip):
     now = time.time()
@@ -83,9 +94,9 @@ def init_firewall(app):
         if client_ip in STATIC_BLACKLIST_IPS or check_ban_status(client_ip):
             abort(403, description="Accesso Negato: IP Sospetto o Bannato.")
         if is_user_agent_blocked(request.headers.get('User-Agent', '')):
-            abort(403, description="Accesso negato: Scanner non autorizzato.")
+            abort(403, description="Accesso negato: Strumento o bot non autorizzato.")
         if not check_rate_limit(client_ip):
-            abort(429, description="Troppe richieste. Riprova più tardi.")
+            abort(429, description="Troppe richieste inviate. Riprova più tardi.")
 
         query_str = request.query_string.decode('utf-8', errors='ignore')
         if is_payload_malicious(query_str):
@@ -100,7 +111,7 @@ def init_firewall(app):
                     ip_violations[client_ip] += 1
                     if ip_violations[client_ip] >= MAX_VIOLATIONS_BEFORE_BAN:
                         trigger_ban(client_ip)
-                    abort(400, description="Payload dannoso rilevato.")
+                    abort(400, description="Payload dannoso rilevato nei dati inviati.")
 
     @app.after_request
     def apply_security_headers(response):
