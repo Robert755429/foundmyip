@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, jsonify
 from firewall import init_firewall
+from antivirus_engine import scan_payload
 
 app = Flask(__name__)
 init_firewall(app)
@@ -28,12 +29,23 @@ def ping_speedtest():
 @app.route('/antivirus_scan', methods=['POST'])
 def antivirus_scan():
     target = request.form.get('target', '').strip()
-    is_threat = any(bad in target.lower() for bad in ['malware', 'virus', 'trojan', 'hack', 'payload', '.exe'])
-    if is_threat:
-        report = f"🚨 ALLARME MINACCIA RILEVATA!\nTarget: {target}\nStato: MALIGNO / INFETTO\nFirma: Sospetto malware o eseguibile pericoloso identificato."
-    else:
-        report = f"✅ SCANSIONE COMPLETATA CON SUCCESSO.\nTarget: {target}\nStato: PULITO (Nessuna minaccia nota rilevata)."
-    return render_template('index.html', active_tab='antivirus', av_result=report)
+    if not target:
+        return render_template('index.html', active_tab='antivirus', av_result="Errore: Inserisci un target valido da analizzare.")
+
+    report = scan_payload(target)
+    
+    formatted_report = (
+        f"🛡️ REPORT ANALISI ANTIVIRUS IMPLACABILE\n"
+        f"----------------------------------------\n"
+        f"🎯 Target: {target}\n"
+        f"📊 Stato: {report['status']}\n"
+        f"⚠️ Punteggio Rischio: {report['risk_score']} / 100\n"
+        f"📦 Tipo Rilevato: {report['file_type']}\n"
+        f"🔐 Hash SHA-256: {report['sha256']}\n"
+        f"📈 Entropia Shannon: {report['entropy']}\n"
+        f"📝 Dettagli: {report['details']}"
+    )
+    return render_template('index.html', active_tab='antivirus', av_result=formatted_report)
 
 @app.route('/submit_idea', methods=['POST'])
 def submit_idea():
