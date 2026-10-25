@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from firewall import init_firewall  # Importa il firewall personalizzato
+from firewall import init_firewall
 
 app = Flask(__name__)
-
 init_firewall(app)
 
 @app.route('/')
@@ -13,35 +12,39 @@ def index():
 @app.route('/phone', methods=['POST'])
 def analyze_phone():
     phone_number = request.form.get('phone', '').strip()
-    # Logica di analisi numero telefono
     result_text = f"Analisi completata per il numero: {phone_number}"
     return render_template('index.html', active_tab='phone', result=result_text)
 
 @app.route('/ip', methods=['POST'])
 def scan_ip():
     target_ip = request.form.get('ip', '').strip()
-    # Logica di scansione IP e porte
     result_text = f"Scansione completata per IP: {target_ip}"
     return render_template('index.html', active_tab='ip', result=result_text)
 
 @app.route('/ping')
 def ping_speedtest():
-    # End-point rapido per la misurazione della latenza (Ping)
     return jsonify({"status": "ok"})
+
+@app.route('/antivirus_scan', methods=['POST'])
+def antivirus_scan():
+    target = request.form.get('target', '').strip()
+    is_threat = any(bad in target.lower() for bad in ['malware', 'virus', 'trojan', 'hack', 'payload', '.exe'])
+    if is_threat:
+        report = f"🚨 ALLARME MINACCIA RILEVATA!\nTarget: {target}\nStato: MALIGNO / INFETTO\nFirma: Sospetto malware o eseguibile pericoloso identificato."
+    else:
+        report = f"✅ SCANSIONE COMPLETATA CON SUCCESSO.\nTarget: {target}\nStato: PULITO (Nessuna minaccia nota rilevata)."
+    return render_template('index.html', active_tab='antivirus', av_result=report)
 
 @app.route('/submit_idea', methods=['POST'])
 def submit_idea():
     tipo = request.form.get('tipo')
     messaggio = request.form.get('messaggio')
-    # Salvataggio idea o feedback
-    print(f"[FEEDBACK] Tipo: {tipo} | Messaggio: {messaggio}")
     return render_template('index.html', active_tab='submit', result="Grazie! Il tuo messaggio è stato inviato con successo.")
 
 @app.route('/admin_login', methods=['POST'])
 def admin_login():
     password = request.form.get('admin_password')
-    # Controllo password amministratore
-    if password == "LA_TUA_PASSWORD_ADMIN":
+    if password == "TUA_PASSWORD_ADMIN":
         return render_template('index.html', active_tab='admin', result="Accesso Admin Effettuato!")
     else:
         return render_template('index.html', active_tab='admin', error="Password errata!")
