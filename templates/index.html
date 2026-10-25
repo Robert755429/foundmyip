@@ -1,13 +1,9 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="top-scroll-nav">
     <button class="tab-btn {% if active_tab == 'phone' %}active{% endif %}" onclick="switchTab('phone')">📱 Telefono</button>
     <button class="tab-btn {% if active_tab == 'ip' %}active{% endif %}" onclick="switchTab('ip')">🌐 IP Lookup</button>
-    <button class="tab-btn {% if active_tab == 'myip' %}active{% endif %}" onclick="switchTab('myip')">📍 Il Mio IP</button>
-    <button class="tab-btn {% if active_tab == 'password' %}active{% endif %}" onclick="switchTab('password')">🔐 Password</button>
-    <button class="tab-btn {% if active_tab == 'qrcode' %}active{% endif %}" onclick="switchTab('qrcode')">📷 QR Code</button>
-    <button class="tab-btn {% if active_tab == 'speedtest' %}active{% endif %}" onclick="switchTab('speedtest')">⚡ Speed Test</button>
+    <button class="tab-btn {% if active_tab == 'antivirus' %}active{% endif %}" onclick="switchTab('antivirus')">🛡️ Antivirus</button>
     <button class="tab-btn {% if active_tab == 'games' %}active{% endif %}" onclick="switchTab('games')">🕹️ Minigiochi</button>
     <button class="tab-btn {% if active_tab == 'submit' %}active{% endif %}" onclick="switchTab('submit')">💡 Idee & Feedback</button>
     <button class="tab-btn {% if active_tab == 'admin' %}active{% endif %}" onclick="switchTab('admin')">🔐 Admin</button>
@@ -15,28 +11,31 @@
 
 {% include 'components/phone.html' %}
 {% include 'components/ip.html' %}
-{% include 'components/myip.html' %}
-{% include 'components/password.html' %}
-{% include 'components/qrcode.html' %}
-{% include 'components/speedtest.html' %}
+{% include 'components/antivirus.html' %}
 {% include 'components/games_list.html' %}
 
 <div id="submit-card" class="card {% if active_tab == 'submit' %}active{% endif %}">
-    <h3 data-i18n="submit_title">💡 Invia una Nuova Idea o un Feedback</h3>
+    <h3>💡 Invia una Nuova Idea o un Feedback</h3>
     <form method="POST" action="/submit_idea">
-        <label data-i18n="submit_type">Seleziona Tipo</label>
+        <label>Seleziona Tipo</label>
         <select name="tipo">
-            <option value="idea" data-i18n="opt_idea">💡 Idea per il sito</option>
-            <option value="feedback" data-i18n="opt_feedback">💬 Feedback / Parere</option>
+            <option value="idea">💡 Idea per il sito</option>
+            <option value="feedback">💬 Feedback / Parere</option>
         </select>
-        <label data-i18n="submit_msg">Il tuo messaggio:</label>
-        <textarea name="messaggio" rows="4" placeholder="Scrivi qui..." style="width: 100%; padding: 12px; margin: 8px 0 16px 0; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px;" data-i18n-placeholder="submit_placeholder" required></textarea>
-        <button type="submit" class="action-btn" data-i18n="submit_btn">Invia Messaggio</button>
+        <label>Il tuo messaggio:</label>
+        <textarea name="messaggio" rows="4" placeholder="Scrivi qui..." style="width:100%; padding:12px; background:var(--input-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:8px;" required></textarea>
+        <button type="submit" class="action-btn">Invia Messaggio</button>
     </form>
-    {% include 'components/updates_block.html' %}
 </div>
 
-{% include 'components/admin.html' %}
+<div id="admin-card" class="card {% if active_tab == 'admin' %}active{% endif %}">
+    <h3>🔐 Area Amministratore Riservata</h3>
+    <form method="POST" action="/admin_login">
+        <label>Inserisci Password Amministratore</label>
+        <input type="password" name="admin_password" placeholder="Password..." required>
+        <button type="submit" class="action-btn">Accedi all'Area Admin</button>
+    </form>
+</div>
 
 {% if result %}
 <div class="card active">
