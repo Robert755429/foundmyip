@@ -37,7 +37,7 @@
     </form>
 </div>
 
-{% if result %}
+{% if result is defined and result %}
 <div class="card active">
     <h3>Risultato Elaborazione:</h3>
     <pre>{{ result }}</pre>
