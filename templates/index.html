@@ -1,98 +1,146 @@
-<!DOCTYPE html>
-<html lang="it" id="htmlTag">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoundmyIp v4.0.0 Pro</title>
-    <style>
-        :root {
-            --bg-color: #0f172a; --card-bg: #1e293b; --text-color: #f8fafc;
-            --accent-color: #8b5cf6; --accent-hover: #7c3aed; --input-bg: #090d16; --border-color: #334155;
-        }
-        body.theme-matrix { --bg-color: #022c22; --card-bg: #064e3b; --accent-color: #10b981; --accent-hover: #059669; }
-        body.theme-ocean { --bg-color: #082f49; --card-bg: #0369a1; --accent-color: #38bdf8; --accent-hover: #0ea5e9; }
-        body.theme-light { --bg-color: #f1f5f9; --card-bg: #ffffff; --text-color: #0f172a; --accent-color: #6366f1; --accent-hover: #4f46e5; --input-bg: #f8fafc; --border-color: #cbd5e1; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; display: flex; min-height: 100vh; }
-        
-        /* BARRA LATERALE (SIDEBAR) */
-        .sidebar { width: 240px; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-        .sidebar h2 { font-size: 1.2rem; color: var(--accent-color); margin: 0 0 15px 10px; }
-        .side-btn { padding: 12px 15px; background: transparent; border: 1px solid transparent; color: var(--text-color); font-weight: 600; border-radius: 8px; cursor: pointer; text-align: left; font-size: 0.9rem; transition: all 0.2s; }
-        .side-btn:hover, .side-btn.active { background: var(--accent-color); color: #fff; border-color: var(--accent-color); }
-        
-        /* CONTENUTO PRINCIPALE */
-        .main-wrapper { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .container { width: 100%; max-width: 750px; flex: 1; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 12px 18px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; }
-        .header-controls { display: flex; align-items: center; gap: 8px; }
-        .control-select { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; }
-        
-        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); border: 1px solid var(--border-color); margin-bottom: 20px; display: none; }
-        .card.active { display: block; }
-        h3 { margin-top: 0; color: var(--accent-color); }
-        input, select.input-box { width: 100%; padding: 12px; margin: 8px 0 16px 0; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; }
-        button.action-btn { width: 100%; padding: 14px; background: var(--accent-color); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-        button.action-btn:hover { background: var(--accent-hover); }
-        
-        /* STILI MINIGIOCHI VERTICALI PULITI */
-        .games-list-container { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
-        .game-card-item { display: block; padding: 15px 20px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; color: #fff; text-decoration: none; font-weight: bold; font-size: 1rem; transition: transform 0.2s, border-color 0.2s; }
-        .game-card-item:hover { transform: translateY(-2px); border-color: var(--accent-color); }
+{% extends 'base.html' %}
+{% block content %}
 
-        /* RESPONSIVE PER SMARTPHONE */
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; overflow-x: auto; padding: 10px; }
-            .sidebar h2 { display: none; }
-            .side-btn { white-space: nowrap; font-size: 0.8rem; padding: 8px 12px; }
-        }
-    </style>
-</head>
-<body class="{{ theme }}">
-    <!-- BARRA LATERALE -->
-    <div class="sidebar">
-        <h2>🌐 FoundmyIp</h2>
-        <button class="side-btn {% if active_tab == 'phone' %}active{% endif %}" onclick="switchTab('phone')">📱 Telefono</button>
-        <button class="side-btn {% if active_tab == 'ip' %}active{% endif %}" onclick="switchTab('ip')">🌐 IP Lookup</button>
-        <button class="side-btn {% if active_tab == 'myip' %}active{% endif %}" onclick="switchTab('myip')">📍 Il Mio IP</button>
-        <button class="side-btn {% if active_tab == 'password' %}active{% endif %}" onclick="switchTab('password')">🔐 Password</button>
-        <button class="side-btn {% if active_tab == 'qrcode' %}active{% endif %}" onclick="switchTab('qrcode')">📷 QR Code</button>
-        <button class="side-btn {% if active_tab == 'speedtest' %}active{% endif %}" onclick="switchTab('speedtest')">⚡ Speed Test</button>
-        <button class="side-btn {% if active_tab == 'antivirus' %}active{% endif %}" onclick="switchTab('antivirus')">🛡️ Antivirus</button>
-        <button class="side-btn {% if active_tab == 'games' %}active{% endif %}" onclick="switchTab('games')">🕹️ Minigiochi</button>
-        <button class="side-btn {% if active_tab == 'auth' %}active{% endif %}" onclick="switchTab('auth')">👤 Login / Registrati</button>
-        <button class="side-btn {% if active_tab == 'submit' %}active{% endif %}" onclick="switchTab('submit')">💡 Feedback</button>
-        <button class="side-btn {% if active_tab == 'admin' %}active{% endif %}" onclick="switchTab('admin')">🔐 Admin</button>
+{% include 'components/phone.html' %}
+
+<!-- IP LOOKUP -->
+<div id="ip-card" class="card {% if active_tab == 'ip' %}active{% endif %}">
+    <h3>🌐 Lookup IP & Porte</h3>
+    <form method="POST" action="/ip">
+        <label>Inserisci Indirizzo IP (es. 8.8.8.8)</label>
+        <input type="text" name="ip" placeholder="8.8.8.8..." required>
+        <button type="submit" class="action-btn">Scansiona Indirizzo IP</button>
+    </form>
+</div>
+
+<!-- IL MIO IP -->
+<div id="myip-card" class="card {% if active_tab == 'myip' %}active{% endif %}">
+    <h3>📍 Localizza il tuo Indirizzo IP & GPS</h3>
+    <p style="font-size:0.9rem; color:#cbd5e1;">Rileva istantaneamente il tuo IP pubblico e le coordinate approssimative.</p>
+    <button type="button" class="action-btn" onclick="fetchMyIp()">Localizza il Mio IP Adesso</button>
+    <pre id="myip-result" style="margin-top:15px; display:none;"></pre>
+</div>
+
+<!-- GENERATORE PASSWORD -->
+<div id="password-card" class="card {% if active_tab == 'password' %}active{% endif %}">
+    <h3>🔐 Generatore & Tester Password</h3>
+    <label>Lunghezza Password: <span id="len-val">16</span></label>
+    <input type="range" min="8" max="64" value="16" oninput="document.getElementById('len-val').textContent = this.value; generatePass();">
+    <button type="button" class="action-btn" onclick="generatePass()">Genera Nuova Password</button>
+    <input type="text" id="pass-output" readonly placeholder="La tua password apparirà qui..." style="margin-top:15px; font-weight:bold; color:var(--accent-color);">
+</div>
+
+<!-- QR CODE -->
+<div id="qrcode-card" class="card {% if active_tab == 'qrcode' %}active{% endif %}">
+    <h3>📷 Generatore QR Code</h3>
+    <label>Inserisci un link o testo</label>
+    <input type="text" id="qr-input" placeholder="https://..." required>
+    <button type="button" class="action-btn" onclick="generateQR()">Crea QR Code</button>
+    <div id="qr-result" style="margin-top:15px; text-align:center;"></div>
+</div>
+
+<!-- SPEED TEST -->
+<div id="speedtest-card" class="card {% if active_tab == 'speedtest' %}active{% endif %}">
+    <h3>⚡ Speed Test Rapido (Ping)</h3>
+    <p style="font-size:0.9rem; color:#cbd5e1;">Misura la latenza di risposta della tua connessione verso il server.</p>
+    <button type="button" class="action-btn" onclick="runPingTest()">Avvia Test Latenza</button>
+    <pre id="speed-result" style="margin-top:15px; display:none;"></pre>
+</div>
+
+{% include 'components/antivirus.html' %}
+
+<!-- MINIGIOCHI SISTEMATI -->
+<div id="games-card" class="card {% if active_tab == 'games' %}active{% endif %}">
+    <h3>🕹️ Area Intrattenimento & Minigiochi</h3>
+    <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 15px;">Seleziona un gioco per iniziare subito:</p>
+    <div class="games-list-container">
+        <a href="/game/platformer" class="game-card-item">🍄 Super Mario Retro (50 Livelli)</a>
+        <a href="/game/lucchetto" class="game-card-item">🔓 Sblocca il Lucchetto Infinito</a>
+        <a href="/game/guesstheflag" class="game-card-item">🌐 Indovina la Bandiera del Mondo</a>
+        <a href="/game/2048" class="game-card-item">🔢 2048 Puzzle</a>
+        <a href="/game/tris" class="game-card-item">❌ Tris (vs AI & 1vs1) ⭕</a>
     </div>
+</div>
 
-    <!-- AREA CONTENUTI -->
-    <div class="main-wrapper">
-        <div class="container">
-            <header>
-                <h1 style="font-size:1.1rem; margin:0; color:var(--accent-color);">FoundmyIp v4.0.0 Pro</h1>
-                <div class="header-controls">
-                    <select id="themeSelect" class="control-select" onchange="changeTheme(this.value)">
-                        <option value="cyber">🎨 Cyber</option>
-                        <option value="matrix">Matrix</option>
-                        <option value="ocean">Ocean</option>
-                        <option value="light">Light</option>
-                    </select>
-                </div>
-            </header>
-            {% block content %}{% endblock %}
-        </div>
-    </div>
+<!-- LOGIN / REGISTRAZIONE CON CAPTCHA -->
+<div id="auth-card" class="card {% if active_tab == 'auth' %}active{% endif %}">
+    <h3>👤 Registrazione Utente & Verifica Email</h3>
+    <form method="POST" action="/register">
+        <label>Nome Utente</label>
+        <input type="text" name="username" placeholder="Username..." required>
+        
+        <label>Email per la Verifica</label>
+        <input type="email" name="email" placeholder="nome@email.com..." required>
+        
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Password sicura..." required>
+        
+        <!-- CAPTCHA SICUREZZA -->
+        <label style="color:var(--accent-color); font-weight:bold;">🧩 CAPTCHA Anti-Bot: Quanto fa 7 + 5?</label>
+        <input type="number" name="captcha_answer" placeholder="Inserisci il risultato..." required>
+        
+        <button type="submit" class="action-btn">Registrati & Invia Email di Verifica</button>
+    </form>
+</div>
 
-    <script src="{{ url_for('static', filename='translations.js') }}"></script>
-    <script>
-        function switchTab(tab) {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
-            const card = document.getElementById(tab + '-card');
-            if(card) card.classList.add('active');
-            event.target.classList.add('active');
-        }
-    </script>
-</body>
-</html>
+<!-- FEEDBACK & ADMIN -->
+<div id="submit-card" class="card {% if active_tab == 'submit' %}active{% endif %}">
+    <h3>💡 Invia una Nuova Idea o un Feedback</h3>
+    <form method="POST" action="/submit_idea">
+        <select name="tipo">
+            <option value="idea">💡 Idea per il sito</option>
+            <option value="feedback">💬 Feedback / Parere</option>
+        </select>
+        <textarea name="messaggio" rows="4" placeholder="Scrivi qui..." style="width:100%; padding:12px; background:var(--input-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:8px;" required></textarea>
+        <button type="submit" class="action-btn" style="margin-top:10px;">Invia Messaggio</button>
+    </form>
+</div>
+
+<div id="admin-card" class="card {% if active_tab == 'admin' %}active{% endif %}">
+    <h3>🔐 Area Amministratore Riservata</h3>
+    <form method="POST" action="/admin_login">
+        <input type="password" name="admin_password" placeholder="Password..." required>
+        <button type="submit" class="action-btn">Accedi Area Admin</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="card active">
+    <h3>Risultato Elaborazione:</h3>
+    <pre>{{ result }}</pre>
+</div>
+{% endif %}
+
+<script>
+function fetchMyIp() {
+    fetch('https://ipapi.co/json/')
+        .then(res => res.json())
+        .then(data => {
+            const out = document.getElementById('myip-result');
+            out.style.display = 'block';
+            out.textContent = `IP: ${data.ip}\nCittà: ${data.city}\nPaese: ${data.country_name}\nISP: ${data.org}`;
+        });
+}
+function generatePass() {
+    const len = document.getElementById('len-val').textContent;
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+    let res = "";
+    for(let i=0; i<len; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+    document.getElementById('pass-output').value = res;
+}
+function generateQR() {
+    const val = document.getElementById('qr-input').value;
+    if(!val) return;
+    document.getElementById('qr-result').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(val)}" alt="QR Code">`;
+}
+function runPingTest() {
+    const start = Date.now();
+    fetch('/ping').then(() => {
+        const diff = Date.now() - start;
+        const out = document.getElementById('speed-result');
+        out.style.display = 'block';
+        out.textContent = `⚡ Latenza Ping Risposta: ${diff} ms`;
+    });
+}
+</script>
+{% endblock %}
