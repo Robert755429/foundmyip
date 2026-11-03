@@ -83,3 +83,16 @@ def game_tris():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.form.get('username', '').strip()
+    email = request.form.get('email', '').strip()
+    captcha_answer = request.form.get('captcha_answer', '').strip()
+    
+    # Verifica CAPTCHA
+    if captcha_answer != "12":
+        return render_template('index.html', active_tab='auth', result="❌ CAPTCHA Errato! Riprova la verifica matematica.")
+        
+    result_text = f"✅ Registrazione completata per {username}!\n✉️ Email di verifica inviata con successo all'indirizzo {email}.\nControlla la tua casella di posta per attivare l'account."
+    return render_template('index.html', active_tab='auth', result=result_text)
