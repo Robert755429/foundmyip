@@ -96,3 +96,7 @@ def register():
         
     result_text = f"✅ Registrazione completata per {username}!\n✉️ Email di verifica inviata con successo all'indirizzo {email}.\nControlla la tua casella di posta per attivare l'account."
     return render_template('index.html', active_tab='auth', result=result_text)
+
+@app.route('/games/pong')
+def pong_game():
+    return render_template('games/pong.html')
