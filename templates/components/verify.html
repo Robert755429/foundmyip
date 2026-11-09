@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica Email e Sicurezza</title>
+    <!-- Script ufficiale di Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px; width: 360px; border: 1px solid #334155; }
+        input { padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 1rem; outline: none; }
+        input:focus { border-color: #38bdf8; }
+        button { background: #3b82f6; color: white; border: none; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #2563eb; }
+        .error { color: #f43f5e; font-size: 0.85rem; font-weight: bold; }
+        .back { color: #38bdf8; text-decoration: none; font-size: 0.85rem; text-align: center; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <form class="card" action="/verify" method="POST">
+        <h2>Verifica di Sicurezza</h2>
+        <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">Inserisci la tua email e conferma il controllo anti-bot.</p>
+        
+        <input type="email" name="email" placeholder="latua@email.com" required>
+        
+        <!-- Widget reCAPTCHA v2 "Non sono un robot" -->
+        <div class="g-recaptcha" data-sitekey="INSERISCI_QUI_LA_TUA_SITE_KEY"></div>
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <button type="submit">Verifica Account</button>
+        <a href="/" class="back">&larr; Torna alla Home</a>
+    </form>
+</body>
+</html>
