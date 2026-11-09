@@ -68,7 +68,7 @@ def verify_user():
         recaptcha_response = request.form.get('g-recaptcha-response')
         
         # Recupera la Secret Key dalle variabili d'ambiente di Render o inseriscila qui
-        secret_key = os.environ.get('RECAPTCHA_SECRET_KEY', 'INSERISCI_QUI_LA_TUA_SECRET_KEY')
+        secret_key = os.environ.get('RECAPTCHA_SECRET_KEY', '6Lcy6xcuAAAAAIUKA5tAyoPWu5GtUEFMYS9IEMQO')
         
         payload = {
             'secret': secret_key,
