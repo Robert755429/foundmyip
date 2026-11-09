@@ -3,54 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indovina la Bandiera - Mondo</title>
+    <title>Indovina la Bandiera</title>
     <style>
-        body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: #1e293b;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-            border: 1px solid #334155;
-        }
-        img.flag {
-            width: 260px;
-            height: auto;
-            border-radius: 6px;
-            margin: 20px 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            border: 2px solid #334155;
-        }
-        .options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        button {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        body { background-color: #0f172a; color: #f8fafc; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { background: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; max-width: 500px; width: 90%; border: 1px solid #334155; }
+        img.flag { width: 250px; height: auto; border-radius: 6px; margin: 20px 0; border: 2px solid #334155; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { background: #3b82f6; color: white; border: none; padding: 12px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; }
         button:hover { background: #2563eb; }
         .score { font-size: 1.2rem; margin-bottom: 15px; color: #38bdf8; }
         #message { margin-top: 15px; font-weight: bold; min-height: 24px; }
@@ -66,76 +25,17 @@
         </div>
         <div id="message"></div>
         <br>
-        <a href="/" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem;">&larr; Torna alla Home</a>
+        <a href="/" style="color: #94a3b8; text-decoration: none;">&larr; Torna alla Home</a>
     </div>
 
     <script>
-        // Elenco completo delle nazioni del mondo con codici ISO e nomi in italiano
         const countries = [
-            { code: 'af', name: 'Afghanistan' }, { code: 'al', name: 'Albania' }, { code: 'dz', name: 'Algeria' },
-            { code: 'ad', name: 'Andorra' }, { code: 'ao', name: 'Angola' }, { code: 'ag', name: 'Antigua e Barbuda' },
-            { code: 'ar', name: 'Argentina' }, { code: 'am', name: 'Armenia' }, { code: 'au', name: 'Australia' },
-            { code: 'at', name: 'Austria' }, { code: 'az', name: 'Azerbaigian' }, { code: 'bs', name: 'Bahamas' },
-            { code: 'bh', name: 'Bahrein' }, { code: 'bd', name: 'Bangladesh' }, { code: 'bb', name: 'Barbados' },
-            { code: 'by', name: 'Bielorussia' }, { code: 'be', name: 'Belgio' }, { code: 'bz', name: 'Belize' },
-            { code: 'bj', name: 'Benin' }, { code: 'bt', name: 'Bhutan' }, { code: 'bo', name: 'Bolivia' },
-            { code: 'ba', name: 'Bosnia ed Erzegovina' }, { code: 'bw', name: 'Botswana' }, { code: 'br', name: 'Brasile' },
-            { code: 'bn', name: 'Brunei' }, { code: 'bg', name: 'Bulgaria' }, { code: 'bf', name: 'Burkina Faso' },
-            { code: 'bi', name: 'Burundi' }, { code: 'cv', name: 'Capo Verde' }, { code: 'kh', name: 'Cambogia' },
-            { code: 'cm', name: 'Camerun' }, { code: 'ca', name: 'Canada' }, { code: 'cf', name: 'Rep. Centrafricana' },
-            { code: 'td', name: 'Ciad' }, { code: 'cl', name: 'Cile' }, { code: 'cn', name: 'Cina' },
-            { code: 'co', name: 'Colombia' }, { code: 'km', name: 'Comore' }, { code: 'cg', name: 'Congo' },
-            { code: 'cr', name: 'Costa Rica' }, { code: 'hr', name: 'Croazia' }, { code: 'cu', name: 'Cuba' },
-            { code: 'cy', name: 'Cipro' }, { code: 'cz', name: 'Repubblica Ceca' }, { code: 'dk', name: 'Danimarca' },
-            { code: 'dj', name: 'Gibuti' }, { code: 'dm', name: 'Dominica' }, { code: 'do', name: 'Repubblica Dominicana' },
-            { code: 'ec', name: 'Ecuador' }, { code: 'eg', name: 'Egitto' }, { code: 'sv', name: 'El Salvador' },
-            { code: 'gq', name: 'Guinea Equatoriale' }, { code: 'er', name: 'Eritrea' }, { code: 'ee', name: 'Estonia' },
-            { code: 'sz', name: 'Eswatini' }, { code: 'et', name: 'Etiopia' }, { code: 'fj', name: 'Figi' },
-            { code: 'fi', name: 'Finlandia' }, { code: 'fr', name: 'Francia' }, { code: 'ga', name: 'Gabon' },
-            { code: 'gm', name: 'Gambia' }, { code: 'ge', name: 'Georgia' }, { code: 'de', name: 'Germania' },
-            { code: 'gh', name: 'Ghana' }, { code: 'gr', name: 'Grecia' }, { code: 'gd', name: 'Grenada' },
-            { code: 'gt', name: 'Guatemala' }, { code: 'gn', name: 'Guinea' }, { code: 'gw', name: 'Guinea-Bissau' },
-            { code: 'gy', name: 'Guyana' }, { code: 'ht', name: 'Haiti' }, { code: 'hn', name: 'Honduras' },
-            { code: 'hu', name: 'Ungheria' }, { code: 'is', name: 'Islanda' }, { code: 'in', name: 'India' },
-            { code: 'id', name: 'Indonesia' }, { code: 'ir', name: 'Iran' }, { code: 'iq', name: 'Iraq' },
-            { code: 'ie', name: 'Irlanda' }, { code: 'il', name: 'Israele' }, { code: 'it', name: 'Italia' },
-            { code: 'jm', name: 'Giamaica' }, { code: 'jp', name: 'Giappone' }, { code: 'jo', name: 'Giordania' },
-            { code: 'kz', name: 'Kazakistan' }, { code: 'ke', name: 'Kenya' }, { code: 'ki', name: 'Kiribati' },
-            { code: 'kp', name: 'Corea del Nord' }, { code: 'kr', name: 'Corea del Sud' }, { code: 'kw', name: 'Kuwait' },
-            { code: 'kg', name: 'Kirghizistan' }, { code: 'la', name: 'Laos' }, { code: 'lv', name: 'Lettonia' },
-            { code: 'lb', name: 'Libano' }, { code: 'ls', name: 'Lesotho' }, { code: 'lr', name: 'Liberia' },
-            { code: 'ly', name: 'Libia' }, { code: 'li', name: 'Liechtenstein' }, { code: 'lt', name: 'Lituania' },
-            { code: 'lu', name: 'Lussemburgo' }, { code: 'mg', name: 'Madagascar' }, { code: 'mw', name: 'Malawi' },
-            { code: 'my', name: 'Malaysia' }, { code: 'mv', name: 'Maldive' }, { code: 'ml', name: 'Mali' },
-            { code: 'mt', name: 'Malta' }, { code: 'mr', name: 'Mauritania' }, { code: 'mu', name: 'Mauritius' },
-            { code: 'mx', name: 'Messico' }, { code: 'fm', name: 'Micronesia' }, { code: 'md', name: 'Moldavia' },
-            { code: 'mc', name: 'Monaco' }, { code: 'mn', name: 'Mongolia' }, { code: 'me', name: 'Montenegro' },
-            { code: 'ma', name: 'Marocco' }, { code: 'mz', name: 'Mozambico' }, { code: 'mm', name: 'Myanmar' },
-            { code: 'na', name: 'Namibia' }, { code: 'nr', name: 'Nauru' }, { code: 'np', name: 'Nepal' },
-            { code: 'nl', name: 'Paesi Bassi' }, { code: 'nz', name: 'Nuova Zelanda' }, { code: 'ni', name: 'Nicaragua' },
-            { code: 'ne', name: 'Niger' }, { code: 'ng', name: 'Nigeria' }, { code: 'no', name: 'Norvegia' },
-            { code: 'om', name: 'Oman' }, { code: 'pk', name: 'Pakistan' }, { code: 'pw', name: 'Palau' },
-            { code: 'pa', name: 'Panama' }, { code: 'pg', name: 'Papua Nuova Guinea' }, { code: 'py', name: 'Paraguay' },
-            { code: 'pe', name: 'Perù' }, { code: 'ph', name: 'Filippine' }, { code: 'pl', name: 'Polonia' },
-            { code: 'pt', name: 'Portogallo' }, { code: 'qa', name: 'Qatar' }, { code: 'ro', name: 'Romania' },
-            { code: 'ru', name: 'Russia' }, { code: 'rw', name: 'Ruanda' }, { code: 'kn', name: 'Saint Kitts e Nevis' },
-            { code: 'lc', name: 'Santa Lucia' }, { code: 'vc', name: 'Saint Vincent e Grenadine' }, { code: 'ws', name: 'Samoa' },
-            { code: 'sm', name: 'San Marino' }, { code: 'st', name: 'São Tomé e Príncipe' }, { code: 'sa', name: 'Arabia Saudita' },
-            { code: 'sn', name: 'Senegal' }, { code: 'rs', name: 'Serbia' }, { code: 'sc', name: 'Seychelles' },
-            { code: 'sl', name: 'Sierra Leone' }, { code: 'sg', name: 'Singapore' }, { code: 'sk', name: 'Slovacchia' },
-            { code: 'si', name: 'Slovenia' }, { code: 'sb', name: 'Isole Salomone' }, { code: 'so', name: 'Somalia' },
-            { code: 'za', name: 'Sudafrica' }, { code: 'ss', name: 'Sud Sudan' }, { code: 'es', name: 'Spagna' },
-            { code: 'lk', name: 'Sri Lanka' }, { code: 'sd', name: 'Sudan' }, { code: 'sr', name: 'Suriname' },
-            { code: 'se', name: 'Svezia' }, { code: 'ch', name: 'Svizzera' }, { code: 'sy', name: 'Siria' },
-            { code: 'tw', name: 'Taiwan' }, { code: 'tj', name: 'Tagikistan' }, { code: 'tz', name: 'Tanzania' },
-            { code: 'th', name: 'Tailandia' }, { code: 'tl', name: 'Timor Est' }, { code: 'tg', name: 'Togo' },
-            { code: 'to', name: 'Tonga' }, { code: 'tt', name: 'Trinidad e Tobago' }, { code: 'tn', name: 'Tunisia' },
-            { code: 'tr', name: 'Turchia' }, { code: 'tm', name: 'Turkmenistan' }, { code: 'tv', name: 'Tuvalu' },
-            { code: 'ug', name: 'Uganda' }, { code: 'ua', name: 'Ucraina' }, { code: 'ae', name: 'Emirati Arabi Uniti' },
-            { code: 'gb', name: 'Regno Unito' }, { code: 'us', name: 'Stati Uniti' }, { code: 'uy', name: 'Uruguay' },
-            { code: 'uz', name: 'Uzbekistan' }, { code: 'vu', name: 'Vanuatu' }, { code: 'va', name: 'Città del Vaticano' },
-            { code: 've', name: 'Venezuela' }, { code: 'vn', name: 'Vietnam' }, { code: 'ye', name: 'Yemen' },
-            { code: 'zm', name: 'Zambia' }, { code: 'zw', name: 'Zimbabwe' }
+            { code: 'it', name: 'Italia' }, { code: 'fr', name: 'Francia' }, { code: 'es', name: 'Spagna' },
+            { code: 'de', name: 'Germania' }, { code: 'gb', name: 'Regno Unito' }, { code: 'us', name: 'Stati Uniti' },
+            { code: 'br', name: 'Brasile' }, { code: 'jp', name: 'Giappone' }, { code: 'ca', name: 'Canada' },
+            { code: 'ar', name: 'Argentina' }, { code: 'au', name: 'Australia' }, { code: 'cn', name: 'Cina' },
+            { code: 'eg', name: 'Egitto' }, { code: 'gr', name: 'Grecia' }, { code: 'mx', name: 'Messico' },
+            { code: 'pt', name: 'Portogallo' }, { code: 'ch', name: 'Svizzera' }, { code: 'nl', name: 'Paesi Bassi' }
         ];
 
         let score = 0;
@@ -143,11 +43,9 @@
 
         function nextQuestion() {
             document.getElementById('message').innerText = '';
-            // Seleziona un paese casuale tra tutti quelli presenti nella lista mondiale
             currentCountry = countries[Math.floor(Math.random() * countries.length)];
             document.getElementById('flag-img').src = `https://flagcdn.com/w320/${currentCountry.code}.png`;
 
-            // Crea 4 opzioni (1 corretta + 3 casuali errate)
             let options = [currentCountry];
             while (options.length < 4) {
                 let randomCountry = countries[Math.floor(Math.random() * countries.length)];
@@ -155,12 +53,11 @@
                     options.push(randomCountry);
                 }
             }
-            // Mischia le opzioni
             options.sort(() => Math.random() - 0.5);
 
             const container = document.getElementById('options-container');
             container.innerHTML = '';
-            options.exports = options.forEach(opt => {
+            options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.innerText = opt.name;
                 btn.onclick = () => checkAnswer(opt.code);
@@ -174,7 +71,7 @@
                 score++;
                 document.getElementById('score').innerText = score;
                 msg.style.color = '#10b981';
-                msg.innerText = 'Corretto! Ottimo lavoro.';
+                msg.innerText = 'Corretto!';
             } else {
                 msg.style.color = '#f43f5e';
                 msg.innerText = `Sbagliato! Era ${currentCountry.name}.`;
