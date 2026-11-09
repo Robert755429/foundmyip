@@ -9,7 +9,7 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-# Rotte per i Giochi
+# --- Rotte per i Giochi (/games/...) ---
 @app.route('/games/platformer')
 def platformer_game():
     return render_template('games/platformer.html')
@@ -33,6 +33,31 @@ def game2048_game():
 @app.route('/games/lock')
 def lock_game():
     return render_template('games/lock.html')
+
+# --- Rotte di compatibilità (/game/...) per evitare errori 404 ---
+@app.route('/game/lucchetto')
+def game_lucchetto():
+    return render_template('games/lock.html')
+
+@app.route('/game/platformer')
+def game_platformer():
+    return render_template('games/platformer.html')
+
+@app.route('/game/guesstheflag')
+def game_guesstheflag():
+    return render_template('games/guesstheflag.html')
+
+@app.route('/game/pong')
+def game_pong():
+    return render_template('games/pong.html')
+
+@app.route('/game/tris')
+def game_tris():
+    return render_template('games/tris.html')
+
+@app.route('/game/game2048')
+def game_game2048():
+    return render_template('games/game2048.html')
 
 # Rotta per la Verifica Email e reCAPTCHA
 @app.route('/verify', methods=['GET', 'POST'])
