@@ -2,132 +2,110 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Mario Retro - FoundmyIp</title>
+    <title>Super Mario Platformer</title>
     <style>
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-        body { margin: 0; padding: 0; background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; touch-action: none; position: relative; }
-        .gear-btn { position: absolute; top: 15px; right: 15px; background: #1e293b; border: 1px solid #334155; color: #f8fafc; font-size: 1.2rem; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s; }
-        .gear-btn:hover { background: #334155; }
-        .game-card { background: #1e293b; padding: 20px; border-radius: 16px; border: 1px solid #334155; text-align: center; width: 95%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h1 { color: #e52521; margin: 0 0 10px 0; font-size: 1.4rem; }
-        canvas { background: #5c94fc; border-radius: 8px; width: 100%; max-width: 380px; height: 220px; border: 2px solid #334155; display: block; margin: 0 auto 15px auto; }
-        .controls { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-        .ctrl-btn { flex: 1; background: #e52521; color: white; border: none; padding: 14px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        .ctrl-btn:active { background: #b91c1c; }
-        .back-link { display: inline-block; margin-top: 10px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
-        .back-link:hover { color: #38bdf8; text-decoration: underline; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100; padding: 20px; }
-        .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 350px; border: 1px solid #334155; text-align: left; }
-        .modal-content h3 { color: #e52521; margin-top: 0; }
-        .modal-close { background: #e52521; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; float: right; margin-top: 15px; font-weight: bold; }
+        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
+        canvas { background: linear-gradient(to bottom, #60a5fa, #bfdbfe); border-radius: 8px; border: 3px solid #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .hud { font-size: 1.2rem; margin-bottom: 10px; color: #fbbf24; font-weight: bold; }
     </style>
 </head>
 <body>
-    <button class="gear-btn" onclick="openModal()">⚙️</button>
+    <h1>Super Mario Platformer</h1>
+    <div class="hud">Monete raccolte: <span id="coins">0</span></div>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <p>Controlli: <b>A / D</b> o <b>Frecce</b> per muoverti, <b>Spazio / W</b> per saltare.</p>
+    <a href="/" style="color: #38bdf8; text-decoration: none;">&larr; Torna alla Home</a>
 
-    <div class="game-card">
-        <h1>🍄 Super Mario Retro</h1>
-        <canvas id="gameCanvas" width="380" height="220"></canvas>
-        <div class="controls">
-            <button class="ctrl-btn" ontouchstart="player.left=true" ontouchend="player.left=false" onmousedown="player.left=true" onmouseup="player.left=false">⬅️ MUOVITI</button>
-            <button class="ctrl-btn" style="background:#10b981;" ontouchstart="jump()" ontouchend="" onmousedown="jump()">⬆️ SALTA</button>
-            <button class="ctrl-btn" ontouchstart="player.right=true" ontouchend="player.right=false" onmousedown="player.right=true" onmouseup="player.right=false">➡️ MUOVITI</button>
-        </div>
-        <a href="/" class="back-link">⬅ Torna alla Dashboard</a>
-    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-    <div id="ruleModal" class="modal">
-        <div class="modal-content">
-            <h3>⚙️ Istruzioni Super Mario</h3>
-            <p>1. Usa i pulsanti laterali per muoverti a destra e sinistra.</p>
-            <p>2. Premi Salta per superare gli ostacoli.</p>
-            <p>3. Evita i nemici rossi e arriva in fondo alla piattaforma!</p>
-            <button class="modal-close" onclick="closeModal()">Capito!</button>
-        </div>
-    </div>
+        let coinsCount = 0;
+        let player = { x: 50, y: 200, width: 28, height: 36, speed: 5, dx: 0, dy: 0, jumpPower: -11, gravity: 0.55, grounded: false };
 
-<script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+        let platforms = [
+            { x: 0, y: 350, width: 800, height: 50 },
+            { x: 180, y: 270, width: 120, height: 20 },
+            { x: 380, y: 200, width: 140, height: 20 },
+            { x: 580, y: 260, width: 120, height: 20 }
+        ];
 
-let player = { x: 50, y: 150, w: 20, h: 25, dx: 0, dy: 0, speed: 3, jumpPower: -8, grounded: false, left: false, right: false };
-let gravity = 0.4;
-let obstacles = [{x: 250, y: 160, w: 25, h: 40}];
-let score = 0;
+        let coins = [
+            { x: 220, y: 230, collected: false },
+            { x: 440, y: 160, collected: false },
+            { x: 630, y: 220, collected: false }
+        ];
 
-function openModal() { document.getElementById('ruleModal').style.display = 'flex'; }
-function closeModal() { document.getElementById('ruleModal').style.display = 'none'; }
+        let keys = {};
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
 
-function jump() {
-    if(player.grounded) {
-        player.dy = player.jumpPower;
-        player.grounded = false;
-    }
-}
+        function update() {
+            if (keys['ArrowRight'] || keys['KeyD']) player.dx = player.speed;
+            else if (keys['ArrowLeft'] || keys['KeyA']) player.dx = -player.speed;
+            else player.dx = 0;
 
-function update() {
-    if(player.left) player.dx = -player.speed;
-    else if(player.right) player.dx = player.speed;
-    else player.dx = 0;
+            if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW']) && player.grounded) {
+                player.dy = player.jumpPower;
+                player.grounded = false;
+            }
 
-    player.x += player.dx;
-    player.dy += gravity;
-    player.y += player.dy;
+            player.dy += player.gravity;
+            player.x += player.dx;
+            player.y += player.dy;
 
-    if(player.y > 175) {
-        player.y = 175;
-        player.dy = 0;
-        player.grounded = true;
-    }
+            player.grounded = false;
+            platforms.forEach(p => {
+                if (player.x < p.x + p.width && player.x + player.width > p.x &&
+                    player.y + player.height > p.y && player.y + player.height - player.dy <= p.y) {
+                    player.y = p.y - player.height;
+                    player.dy = 0;
+                    player.grounded = true;
+                }
+            });
 
-    if(player.x < 0) player.x = 0;
-    if(player.x > canvas.width - 20) player.x = canvas.width - 20;
+            coins.forEach(c => {
+                if (!c.collected && Math.hypot((player.x + 14) - c.x, (player.y + 18) - c.y) < 20) {
+                    c.collected = true;
+                    coinsCount++;
+                    document.getElementById('coins').innerText = coinsCount;
+                }
+            });
 
-    // Obstacles loop
-    obstacles.forEach(obs => {
-        obs.x -= 2;
-        if(obs.x < -30) obs.x = canvas.width + Math.random() * 100;
-        
-        // Collision check
-        if(player.x < obs.x + obs.w && player.x + player.w > obs.x && player.y < obs.y + obs.h && player.y + player.h > obs.y) {
-            player.x = 50;
-            score = 0;
+            if (player.x < 0) player.x = 0;
+            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+            if (player.y > canvas.height) { player.x = 50; player.y = 200; player.dy = 0; }
         }
-    });
 
-    score++;
-}
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-function draw() {
-    ctx.fillStyle = '#5c94fc';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+            platforms.forEach(p => {
+                ctx.fillStyle = '#b91c1c';
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+                ctx.fillStyle = '#15803d';
+                ctx.fillRect(p.x, p.y, p.width, 6);
+            });
 
-    // Ground
-    ctx.fillStyle = '#e52521';
-    ctx.fillRect(0, 200, canvas.width, 20);
+            coins.forEach(c => {
+                if (!c.collected) {
+                    ctx.fillStyle = '#fbbf24';
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
 
-    // Player
-    ctx.fillStyle = '#facc15';
-    ctx.fillRect(player.x, player.y, player.w, player.h);
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(player.x, player.y + 10, player.width, player.height - 10);
+            ctx.fillStyle = '#2563eb';
+            ctx.fillRect(player.x + 4, player.y + 18, player.width - 8, player.height - 18);
+            ctx.fillStyle = '#fde047';
+            ctx.fillRect(player.x + 4, player.y, player.width - 8, 10);
+        }
 
-    // Obstacles
-    ctx.fillStyle = '#10b981';
-    obstacles.forEach(obs => ctx.fillRect(obs.x, obs.y, obs.w, obs.h));
-
-    // Score
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 14px sans-serif';
-    ctx.fillText("PUNTI: " + score, 15, 25);
-}
-
-function loop() {
-    update();
-    draw();
-    requestAnimationFrame(loop);
-}
-
-loop();
-</script>
+        function loop() { update(); draw(); requestAnimationFrame(loop); }
+        loop();
+    </script>
 </body>
 </html>
