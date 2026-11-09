@@ -1,25 +1,18 @@
-<div id="updates-block" style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px; position: relative;">
-    <button type="button" onclick="dismissUpdatesBlock()" style="position: absolute; top: 12px; right: 0; background: transparent; border: none; color: #94a3b8; font-size: 1.1rem; font-weight: bold; cursor: pointer; padding: 4px 8px;">✕</button>
-    <h4 style="margin: 0 0 10px 0; color: var(--accent-color); font-size: 0.9rem;">🚀 Storico Aggiornamenti</h4>
-    <div style="max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); text-align: left;">
-        <div style="margin-bottom: 10px; border-left: 3px solid var(--accent-color); padding-left: 8px;">
-            <strong style="font-size: 0.8rem; color: var(--accent-color);">v4.0.0 Pro (Ultimate Edition) - Ottobre 2026</strong>
-            <ul style="margin: 3px 0 0 0; padding-left: 15px; font-size: 0.75rem; color: #cbd5e1; line-height: 1.3;">
-                <li>Integrazione WAF Firewall avanzato con Auto-Ban.</li>
-                <li>Modulo Antivirus & Malware Scanner integrato.</li>
-                <li>Traduzione multilingua automatica in tempo reale.</li>
-            </ul>
-        </div>
-    </div>
+<div class="updates-card" style="background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px;">
+    <h3 style="color: #38bdf8; margin-top: 0; margin-bottom: 15px;">🚀 Ultime Novità e Aggiornamenti</h3>
+    
+    <ul style="color: #cbd5e1; padding-left: 20px; line-height: 1.6; margin: 0;">
+        <li>
+            <b style="color: #f8fafc;">🏓 Pong Online Multiplayer:</b> Aggiunto il nuovo gioco multiplayer in tempo reale da browser a browser tramite stanze P2P! (<a href="/games/pong" style="color: #38bdf8; text-decoration: none;">Gioca ora</a>)
+        </li>
+        <li>
+            <b style="color: #f8fafc;">🎮 Super Mario Platformer:</b> Grafica completamente rinnovata, stile retro fluido, piattaforme curate e monete collezionabili. (<a href="/games/platformer" style="color: #38bdf8; text-decoration: none;">Gioca ora</a>)
+        </li>
+        <li>
+            <b style="color: #f8fafc;">🌍 Indovina la Bandiera:</b> Aggiornato l'archivio con tutte le nazioni del mondo e immagini delle bandiere stabili e sicure. (<a href="/games/guesstheflag" style="color: #38bdf8; text-decoration: none;">Gioca ora</a>)
+        </li>
+        <li>
+            <b style="color: #f8fafc;">🔒 Sicurezza e reCAPTCHA:</b> Integrato il sistema di verifica anti-bot "Non sono un robot" di Google e la gestione della verifica email. (<a href="/verify" style="color: #38bdf8; text-decoration: none;">Vai alla verifica</a>)
+        </li>
+    </ul>
 </div>
-<script>
-function dismissUpdatesBlock() {
-    document.querySelectorAll('#updates-block').forEach(b => b.style.display = 'none');
-    localStorage.setItem('updates_dismissed', 'true');
-}
-if (localStorage.getItem('updates_dismissed') === 'true') {
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll('#updates-block').forEach(b => b.style.display = 'none');
-    });
-}
-</script>
