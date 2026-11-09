@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Verifica Completata</title>
+    <style>
+        body { background-color: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; max-width: 400px; }
+        .success-icon { font-size: 3rem; color: #10b981; margin-bottom: 10px; }
+        a { display: inline-block; margin-top: 20px; color: #38bdf8; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="success-icon">✔</div>
+        <h2>Verifica Superata!</h2>
+        <p style="color: #94a3b8;">Il controllo reCAPTCHA e la verifica per l'indirizzo <b>{{ email }}</b> sono andati a buon fine.</p>
+        <a href="/">&larr; Torna alla Home</a>
+    </div>
+</body>
+</html>
