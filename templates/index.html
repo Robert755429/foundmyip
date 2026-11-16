@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% include 'components/phone.html' %}
+
+<!-- IP LOOKUP -->
+<div id="ip-card" class="card {% if active_tab == 'ip' %}active{% endif %}">
+    <h3>🌐 Lookup IP & Porte</h3>
+    <form method="POST" action="/ip">
+        <label>Inserisci Indirizzo IP (es. 8.8.8.8)</label>
+        <input type="text" name="ip" placeholder="8.8.8.8..." required>
+        <button type="submit" class="action-btn">Scansiona Indirizzo IP</button>
+    </form>
+</div>
+
+<!-- IL MIO IP -->
+<div id="myip-card" class="card {% if active_tab == 'myip' %}active{% endif %}">
+    <h3>📍 Localizza il tuo Indirizzo IP & GPS</h3>
+    <p style="font-size:0.9rem; color:#cbd5e1;">Rileva istantaneamente il tuo IP pubblico e le coordinate approssimative.</p>
+    <button type="button" class="action-btn" onclick="fetchMyIp()">Localizza il Mio IP Adesso</button>
+    <pre id="myip-result" style="margin-top:15px; display:none;"></pre>
+</div>
+
+<!-- GENERATORE PASSWORD -->
+<div id="password-card" class="card {% if active_tab == 'password' %}active{% endif %}">
+    <h3>🔐 Generatore & Tester Password</h3>
+    <label>Lunghezza Password: <span id="len-val">16</span></label>
+    <input type="range" min="8" max="64" value="16" oninput="document.getElementById('len-val').textContent = this.value; generatePass();">
+    <button type="button" class="action-btn" onclick="generatePass()">Genera Nuova Password</button>
+    <input type="text" id="pass-output" readonly placeholder="La tua password apparirà qui..." style="margin-top:15px; font-weight:bold; color:var(--accent-color);">
+</div>
+
+<!-- QR CODE -->
+<div id="qrcode-card" class="card {% if active_tab == 'qrcode' %}active{% endif %}">
+    <h3>📷 Generatore QR Code</h3>
+    <label>Inserisci un link o testo</label>
+    <input type="text" id="qr-input" placeholder="https://..." required>
+    <button type="button" class="action-btn" onclick="generateQR()">Crea QR Code</button>
+    <div id="qr-result" style="margin-top:15px; text-align:center;"></div>
+</div>
+
+<!-- SPEED TEST -->
+<div id="speedtest-card" class="card {% if active_tab == 'speedtest' %}active{% endif %}">
+    <h3>⚡ Speed Test Rapido (Ping)</h3>
+    <p style="font-size:0.9rem; color:#cbd5e1;">Misura la latenza di risposta della tua connessione verso il server.</p>
+    <button type="button" class="action-btn" onclick="runPingTest()">Avvia Test Latenza</button>
+    <pre id="speed-result" style="margin-top:15px; display:none;"></pre>
+</div>
+
+{% include 'components/antivirus.html' %}
+
+<!-- MINIGIOCHI SISTEMATI -->
+<div id="games-card" class="card {% if active_tab == 'games' %}active{% endif %}">
+    <h3>🕹️ Area Intrattenimento & Minigiochi</h3>
+    <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 15px;">Seleziona un gioco per iniziare subito:</p>
+    <div class="games-list-container">
+        <a href="/game/platformer" class="game-card-item">🍄 Super Mario Retro (50 Livelli)</a>
+        <a href="/game/lucchetto" class="game-card-item">🔓 Sblocca il Lucchetto Infinito</a>
+        <a href="/game/guesstheflag" class="game-card-item">🌐 Indovina la Bandiera del Mondo</a>
+        <a href="/game/2048" class="game-card-item">🔢 2048 Puzzle</a>
+        <a href="/game/tris" class="game-card-item">❌ Tris (vs AI & 1vs1) ⭕</a>
+    </div>
+</div>
+
+<!-- LOGIN / REGISTRAZIONE CON CAPTCHA -->
+<div id="auth-card" class="card {% if active_tab == 'auth' %}active{% endif %}">
+    <h3>👤 Registrazione Utente & Verifica Email</h3>
+    <form method="POST" action="/register">
+        <label>Nome Utente</label>
+        <input type="text" name="username" placeholder="Username..." required>
+        
+        <label>Email per la Verifica</label>
+        <input type="email" name="email" placeholder="nome@email.com..." required>
+        
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Password sicura..." required>
+        
+        <!-- CAPTCHA SICUREZZA -->
+        <label style="color:var(--accent-color); font-weight:bold;">🧩 CAPTCHA Anti-Bot: Quanto fa 7 + 5?</label>
+        <input type="number" name="captcha_answer" placeholder="Inserisci il risultato..." required>
+        
+        <button type="submit" class="action-btn">Registrati & Invia Email di Verifica</button>
+    </form>
+</div>
+
+<!-- FEEDBACK & ADMIN -->
+<div id="submit-card" class="card {% if active_tab == 'submit' %}active{% endif %}">
+    <h3>💡 Invia una Nuova Idea o un Feedback</h3>
+    <form method="POST" action="/submit_idea">
+        <select name="tipo">
+            <option value="idea">💡 Idea per il sito</option>
+            <option value="feedback">💬 Feedback / Parere</option>
+        </select>
+        <textarea name="messaggio" rows="4" placeholder="Scrivi qui..." style="width:100%; padding:12px; background:var(--input-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:8px;" required></textarea>
+        <button type="submit" class="action-btn" style="margin-top:10px;">Invia Messaggio</button>
+    </form>
+</div>
+
+<div id="admin-card" class="card {% if active_tab == 'admin' %}active{% endif %}">
+    <h3>🔐 Area Amministratore Riservata</h3>
+    <form method="POST" action="/admin_login">
+        <input type="password" name="admin_password" placeholder="Password..." required>
+        <button type="submit" class="action-btn">Accedi Area Admin</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="card active">
+    <h3>Risultato Elaborazione:</h3>
+    <pre>{{ result }}</pre>
+</div>
+{% endif %}
+
+<script>
+function fetchMyIp() {
+    fetch('https://ipapi.co/json/')
+        .then(res => res.json())
+        .then(data => {
+            const out = document.getElementById('myip-result');
+            out.style.display = 'block';
+            out.textContent = `IP: ${data.ip}\nCittà: ${data.city}\nPaese: ${data.country_name}\nISP: ${data.org}`;
+        });
+}
+function generatePass() {
+    const len = document.getElementById('len-val').textContent;
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+    let res = "";
+    for(let i=0; i<len; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+    document.getElementById('pass-output').value = res;
+}
+function generateQR() {
+    const val = document.getElementById('qr-input').value;
+    if(!val) return;
+    document.getElementById('qr-result').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(val)}" alt="QR Code">`;
+}
+function runPingTest() {
+    const start = Date.now();
+    fetch('/ping').then(() => {
+        const diff = Date.now() - start;
+        const out = document.getElementById('speed-result');
+        out.style.display = 'block';
+        out.textContent = `⚡ Latenza Ping Risposta: ${diff} ms`;
+    });
+}
+</script>
+{% endblock %}
