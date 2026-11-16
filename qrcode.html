@@ -1,0 +1,20 @@
+<div id="qrcode-card" class="card {% if active_tab == 'qrcode' %}active{% endif %}">
+    <h3>📱 Generatore QR Code</h3>
+    <label>Inserisci un link o un testo</label>
+    <input type="text" id="qrText" placeholder="https://esempio.it" value="https://google.com">
+    <button type="button" class="action-btn" onclick="generateQR()">Crea QR Code</button>
+    
+    <div id="qrResult" style="margin-top: 20px; text-align: center; display: none;">
+        <img id="qrImg" src="" alt="QR Code" style="border: 4px solid var(--border-color); border-radius: 8px;">
+    </div>
+</div>
+
+<script>
+function generateQR() {
+    const txt = document.getElementById('qrText').value;
+    if (!txt) return;
+    const img = document.getElementById('qrImg');
+    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(txt)}`;
+    document.getElementById('qrResult').style.display = 'block';
+}
+</script>

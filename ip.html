@@ -1,0 +1,8 @@
+<div id="ip-card" class="card {% if active_tab == 'ip' %}active{% endif %}">
+    <h3>Lookup IP & Porte</h3>
+    <form method="POST" action="/ip">
+        <label>Inserisci IP (es. 8.8.8.8)</label>
+        <input type="text" name="ip" placeholder="8.8.8.8..." value="{{ ip_val or '' }}" required>
+        <button type="submit" class="action-btn">Scansiona Indirizzo IP</button>
+    </form>
+</div>
