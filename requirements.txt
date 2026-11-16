@@ -1,4 +1,0 @@
-requests
-phonenumbers
-flask
-gunicorn 
