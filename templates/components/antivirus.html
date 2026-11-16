@@ -1,0 +1,14 @@
+<div id="antivirus-card" class="card {% if active_tab == 'antivirus' %}active{% endif %}">
+    <h3>🛡️ Antivirus & Scanner Malware</h3>
+    <p style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.4;">Analizza link, file o stringhe di testo alla ricerca di minacce, malware o firme di exploit noti utilizzando il nostro motore euristico avanzato.</p>
+    
+    <form method="POST" action="/antivirus_scan">
+        <label>Inserisci URL, Testo o Nome File da Analizzare</label>
+        <input type="text" name="target" placeholder="https://sito-sospetto.com o payload..." required>
+        <button type="submit" class="action-btn">Avvia Scansione Antivirus Implacabile</button>
+    </form>
+
+    {% if av_result %}
+    <pre style="margin-top: 15px;">{{ av_result }}</pre>
+    {% endif %}
+</div>
